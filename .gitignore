@@ -1,2 +1,5 @@
 .vscode/*
 lib/*
+build/*
+clients/java/build/*
+clients/java/.gradle
