@@ -28,3 +28,19 @@ Note that this project is still very early stage and should **NOT** be considere
 - [ ] Ensure we free memory correctly. See https://golang.org/cmd/cgo/#hdr-Go_references_to_C
 - [ ] Build and package the client with compiled C code for all required platforms, using e.g. [github.com/karalabe/xgo](https://github.com/karalabe/xgo).
 - [ ] Return full client responses instead of primitive types.
+
+
+## Resources
+
+For example code and more reading on the specific tech behind this cross language magic, see these resources:
+
+- https://medium.com/learning-the-go-programming-language/calling-go-functions-from-other-languages-4c7d8bcc69bf
+- https://github.com/vladimirvivien/go-cshared-examples/
+- https://github.com/draffensperger/go-interlang
+- https://golang.org/cmd/cgo/
+
+## Getting Help
+
+Come chat with us on [Discord](https://discord.gg/EQcE87s) or email us at [support@secrethub.io](mailto:support@secrethub.io)
+
+
