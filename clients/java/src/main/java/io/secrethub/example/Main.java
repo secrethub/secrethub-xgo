@@ -12,7 +12,6 @@ public class Main {
 
         // Use the client
         System.out.println("The secret "+path);
-        System.out.println("Exists: "+client.exists(path));
         System.out.println("Contains: "+client.read(path));
     }
 }
