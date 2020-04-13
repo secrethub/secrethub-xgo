@@ -25,9 +25,36 @@ In the future, we may want to check out [github.com/karalabe/xgo](https://github
 
 Note that this project is still very early stage and should **NOT** be considered anywhere near stable enough to use in production. 
 
+- [X] Serialize data through one single type (e.g. `GoString`)
+- [X] Implement a single contract for multiple languages with generated boilerplate.
+- [ ] Review data serialization & abstract encoding away to avoid boilerplate.
+- [ ] Improve/implement error handling
 - [ ] Ensure we free memory correctly. See https://golang.org/cmd/cgo/#hdr-Go_references_to_C
-- [ ] Build and package the client with compiled C code for all required platforms, using e.g. [github.com/karalabe/xgo](https://github.com/karalabe/xgo).
-- [ ] Return full client responses instead of primitive types.
+- [ ] Organize repo structure, naming, and separate repos vs. monorepo.
+- [ ] Dockerize build process
+- [ ] Build for Linux, macOS & Windows
+- [ ] Package for language native platforms, including the `.so` files etc.
+- [ ] Make a beautiful README.md
+- [ ] Implement Java Client:
+    - [X] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
+- [ ] Implement Python Client:
+    - [X] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
+- [ ] Implement Ruby Client:
+    - [ ] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
+- [ ] Implement JavaScript/Node Client:
+    - [ ] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
 
 
 ## Resources
