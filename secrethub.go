@@ -5,24 +5,24 @@ package main
 
 import (
 	"C"
-	"encoding/json"
+
+	"encoding/base64"
 
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
+	"github.com/secrethub/secrethub-xgo/bridge"
+	"google.golang.org/protobuf/proto"
 )
-
-type ReadRequest struct {
-	Path string `json:"path"`
-}
-
-type ReadResponse struct {
-	Error  error  `json:"error"`
-	Secret string `json:"secret"`
-}
 
 //export Read
 func Read(cRequest *C.char) *C.char {
-	req := &ReadRequest{}
-	err := json.Unmarshal([]byte(C.GoString(cRequest)), req)
+	req := &bridge.ReadRequest{}
+
+	enc, err := base64.StdEncoding.DecodeString(C.GoString(cRequest))
+	if err != nil {
+		panic(err)
+	}
+
+	err = proto.Unmarshal(enc, req)
 	if err != nil {
 		panic(err)
 	}
@@ -32,18 +32,23 @@ func Read(cRequest *C.char) *C.char {
 		panic(err)
 	}
 
+	res := &bridge.ReadResponse{}
 	secret, err := client.Secrets().ReadString(req.Path)
-	res := &ReadResponse{
-		Secret: secret,
-		Error:  err,
+	if err == nil {
+		res.Secret = &bridge.Secret{
+			Path: req.Path,
+			Data: []byte(secret),
+		}
+	} else {
+		res.Error = err.Error()
 	}
 
-	resJson, err := json.Marshal(res)
+	resBytes, err := proto.Marshal(res)
 	if err != nil {
 		panic(err)
 	}
 
-	return C.CString(string(resJson))
+	return C.CString(base64.StdEncoding.EncodeToString(resBytes))
 }
 
 func main() {}

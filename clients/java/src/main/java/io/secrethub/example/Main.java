@@ -12,6 +12,11 @@ public class Main {
 
         // Use the client
         System.out.println("The secret "+path);
-        System.out.println("Contains: "+client.read(path));
+
+        try {
+            System.out.println("read: "+client.read(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
