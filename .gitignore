@@ -3,3 +3,9 @@ lib/*
 build/*
 clients/java/build/*
 clients/java/.gradle
+
+*.pyc
+
+*.dylib
+*.h
+*_pb2.py
