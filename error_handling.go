@@ -1,4 +1,4 @@
-package secrethub_xgo
+package main
 import "C"
 
 // Workaround for error handling.
