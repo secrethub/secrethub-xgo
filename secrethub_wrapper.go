@@ -2,79 +2,59 @@ package secrethub_xgo
 
 import (
 	"C"
-	"os"
 	"strings"
 
 	"github.com/secrethub/secrethub-go/internals/api"
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
+// Read retrieves a secret from SecretHub, given its path.
+// It throws an error if it fails to initialize the SecretHub client
+// or if it fails to retrieve the secret.
 //export Read
-func Read(path string) (*api.Secret, error) {
+func Read(path string) *api.Secret {
 	client, err := secrethub.NewClient()
 	if err != nil {
-		return nil, err
+		setErr(err)
+		return nil
 	}
 	secret, err := client.Secrets().Get(path)
 	if err != nil {
-		return nil, err
+		setErr(err)
+		return nil
 	}
-	return secret, nil
+	return secret
 }
 
+// Resolve fetches the values of a secret from SecretHub, when the `ref` parameter
+// has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
-func Resolve(ref string) ([]byte, error) {
+func Resolve(ref string) []byte {
 	client, err := secrethub.NewClient()
 	if err != nil {
-		return nil, err
+		setErr(err)
+		return nil
 	}
 	bits := strings.Split(ref, "://")
 	if len(bits) == 2 && bits[0] == "secrethub" {
 		secret, err := client.Secrets().Read(bits[1])
 		if err != nil {
-			return nil, err
+			setErr(err)
+			return nil
 		}
-		return secret.Data, nil
+		return secret.Data
 	}
-	return []byte(ref), nil
+	return []byte(ref)
 }
 
+// ResolveEnv takes a map of environment variables and replaces the values of those
+// which store references of secrets in SecretHub (`secrethub://<path>`) with the value
+// of the respective secret. The other entries in the map remain untouched.
 //export ResolveEnv
-func ResolveEnv() (map[string]string, error) {
-	env := os.Environ()
-	resolvedEnv := make(map[string]string, len(env))
-	for _, keyValuePair := range env {
-		bits := strings.Split(keyValuePair, "=")
-		resolvedVar, err := Resolve(bits[1])
-		if err != nil {
-			return nil, err
-		}
-		resolvedEnv[bits[0]] = string(resolvedVar)
+func ResolveEnv(envVars map[string]string) map[string]string {
+	resolvedEnv := make(map[string]string, len(envVars))
+	for key, value := range envVars {
+		resolvedEnv[key] = string(Resolve(value))
 	}
-	return resolvedEnv, nil
-}
-
-// Workaround for error handling.
-
-// errMessage stores the message of the last encountered error.
-// If no error was encountered it is "".
-var errMessage string
-
-// setErr stores the message of the given error in errMessage,
-// so it can be checked from the wrapper C code.
-func setErr(err error) {
-	errMessage = err.Error()
-}
-
-// checkErr returns the message of the last encountered error.
-// It is called from the C wrapper code.
-//export checkErr
-func checkErr() *C.char {
-	return C.CString(errMessage)
-}
-
-// clearErr clears errMessage.
-//export clearErr
-func clearErr() {
-	errMessage = ""
+	return resolvedEnv
 }
