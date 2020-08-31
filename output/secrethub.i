@@ -17,5 +17,6 @@
   }
 }
 
-extern char *Read(char* path, char** errMessage);
-extern char *Resolve(char* path, char** errMessage);
+extern char* Read(char* path, char** errMessage);
+extern char* ReadString(char* path, char** errMessage);
+extern char* Resolve(char* path, char** errMessage);
