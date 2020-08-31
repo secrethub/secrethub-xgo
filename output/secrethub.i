@@ -4,14 +4,18 @@
 %}
 %include exception.i
 #include "secrethub.h"
+#include <stdio.h>
 
-%exception {
-    clearErr();
-    $action
-    char *errMsg = checkErr();
-    if(strlen(errMsg)) {
-        SWIG_exception(SWIG_RuntimeError, errMsg);
-    }
+%typemap(in, numinputs=0) char **errMessage (char *temp="") {
+  $1 = &temp;
 }
-extern char *Read(char*);
-extern char *Resolve(char*);
+
+%typemap(argout, canthrow=1) char **errMessage {
+  char *errMsg = *$1;
+  if(strlen(errMsg) != 0) {
+      SWIG_exception(SWIG_RuntimeError, errMsg);
+  }
+}
+
+extern char *Read(char* path, char** errMessage);
+extern char *Resolve(char* path, char** errMessage);

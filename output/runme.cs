@@ -5,7 +5,6 @@ using System;
              Console.WriteLine(secrethub.Read("marton/demo/username"));
              Console.WriteLine(secrethub.Read("marton/asfdasjfk/asdfasdf"));
          } catch (Exception e) {
-             Console.WriteLine("lalala");
              Console.WriteLine("Exception caught: {0}", e);
         }
      }
