@@ -17,6 +17,11 @@
   }
 }
 
-extern char* Read(char* path, char** errMessage);
+extern struct Secret Read(char* path, char** errMessage);
 extern char* ReadString(char* path, char** errMessage);
 extern char* Resolve(char* path, char** errMessage);
+
+extern struct Secret{
+    int Version;
+    char* Data;
+};
