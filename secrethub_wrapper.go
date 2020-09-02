@@ -30,8 +30,8 @@ func Read(path *C.char, errMessage **C.char) C.struct_Secret {
 		return C.struct_Secret{}
 	}
 	return C.struct_Secret{
-		Version: C.int(secret.Version),
-		Data:    C.CString(string(secret.Data)),
+		Version:   C.int(secret.Version),
+		Data:      C.CString(string(secret.Data)),
 		CreatedAt: C.longlong(secret.CreatedAt.Unix()),
 	}
 }
