@@ -50,4 +50,5 @@ extern struct Secret {
     int Version;
     char* Data;
     long long CreatedAt;
+	char* Status;
 };

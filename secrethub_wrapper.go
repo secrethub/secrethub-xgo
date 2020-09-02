@@ -6,6 +6,7 @@ struct Secret {
 	int Version;
 	char* Data;
 	long long CreatedAt;
+	char* Status;
 };
 #include <stdbool.h>
 */
@@ -35,6 +36,7 @@ func Read(path *C.char, errMessage **C.char) C.struct_Secret {
 		Version:         C.int(secret.Version),
 		Data:            C.CString(string(secret.Data)),
 		CreatedAt:       C.longlong(secret.CreatedAt.Unix()),
+		Status: 		 C.CString(secret.Status),
 	}
 }
 
