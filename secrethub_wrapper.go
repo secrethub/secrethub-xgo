@@ -53,21 +53,13 @@ func Resolve(ref *C.char, errMessage **C.char) *C.char {
 // which store references of secrets in SecretHub (`secrethub://<path>`) with the value
 // of the respective secret. The other entries in the map remain untouched.
 //export ResolveEnv
-func ResolveEnv(errMessage **C.char) *C.char {
-	envVars := os.Environ()
+func ResolveEnv(envVars map[string]string) map[string]string {
 	resolvedEnv := make(map[string]string, len(envVars))
-	for _, value := range envVars {
-		keyValue := strings.Split(value, "=")
-		resolvedEnv[keyValue[0]] = C.GoString(Resolve(keyValue[1], errMessage))
+	for key, value := range envVars {
+		resolvedEnv[key] = string(Resolve(value))
 	}
-	encoding, err := json.Marshal(resolvedEnv)
-	if err != nil {
-		*errMessage = C.CString(err.Error())
-		return nil
-	}
-	return C.CString(encoding)
-}
-*/
+	return resolvedEnv
+}*/
 
 // Exists checks if a secret exists at `path`.
 //export Exists
