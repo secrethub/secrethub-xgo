@@ -16,14 +16,14 @@
   }
 }
 
-%typemap(cstype) long Secret::CreatedAt "System.DateTime"
-%typemap(csvarout, excode=SWIGEXCODE) long Secret::CreatedAt %{
+%typemap(cstype) long long Secret::CreatedAt "System.DateTime"
+%typemap(csvarout, excode=SWIGEXCODE) long long Secret::CreatedAt %{
 get {
     System.DateTime ret = System.DateTimeOffset.FromUnixTimeSeconds($imcall).UtcDateTime;$excode
     return ret;
 }
 %}
-%typemap(csvarin, excode=SWIGEXCODE) long Secret::CreatedAt %{
+%typemap(csvarin, excode=SWIGEXCODE) long long Secret::CreatedAt %{
 // Secret.CreatedAt is read only
 %}
 
@@ -37,5 +37,5 @@ extern void Write(char* path, char* secret, char** errMessage);
 extern struct Secret {
     int Version;
     char* Data;
-    long CreatedAt;
+    long long CreatedAt;
 };
