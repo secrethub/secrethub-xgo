@@ -5,6 +5,7 @@
 %include exception.i
 #include "secrethub.h"
 
+// Handle error message output parameters.
 %typemap(in, numinputs=0) char **errMessage (char *temp="") {
   $1 = &temp;
 }
@@ -16,6 +17,7 @@
   }
 }
 
+// Map the time type to System.DateTime.
 %apply long long { time };
 %typemap(cstype) time "System.DateTime"
 %typemap(csvarout, excode=SWIGEXCODE) time %{
@@ -28,6 +30,7 @@
     // time is read only
 %}
 
+// Map the uuid type to System.Guid.
 %apply char* { uuid };
 %typemap(cstype) uuid "System.Guid"
 %typemap(csvarout, excode=SWIGEXCODE) uuid %{
@@ -37,7 +40,7 @@
     }
 %}
 %typemap(csvarin, excode=SWIGEXCODE) uuid %{
-    // SecretVersion.SecretVersionID is read only
+    // uuids are read only
 %}
 
 extern struct SecretVersion Read(char* path, char** errMessage);
