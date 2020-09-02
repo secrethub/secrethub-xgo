@@ -3,8 +3,22 @@ package main
 /*
 typedef long long time;
 typedef char* uuid;
+
+struct Secret {
+	uuid SecretID;
+	uuid DirID;
+	uuid RepoID;
+	char* Name;
+	char* BlindName;
+	int VersionCount;
+	int LatestVersion;
+	char* Status;
+	time CreatedAt;
+};
+
 struct SecretVersion {
 	uuid SecretVersionID;
+	struct Secret Secret;
 	int Version;
 	char* Data;
 	time CreatedAt;
@@ -35,10 +49,21 @@ func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 	}
 	return C.struct_SecretVersion{
 		SecretVersionID: C.CString(secret.SecretVersionID.String()),
-		Version:         C.int(secret.Version),
-		Data:            C.CString(string(secret.Data)),
-		CreatedAt:       C.longlong(secret.CreatedAt.Unix()),
-		Status: 		 C.CString(secret.Status),
+		Secret: C.struct_Secret{
+			SecretID:      C.CString(secret.Secret.SecretID.String()),
+			DirID:         C.CString(secret.Secret.DirID.String()),
+			RepoID:        C.CString(secret.Secret.RepoID.String()),
+			Name:          C.CString(secret.Secret.Name),
+			BlindName:     C.CString(secret.Secret.BlindName),
+			VersionCount:  C.int(secret.Secret.VersionCount),
+			LatestVersion: C.int(secret.Secret.LatestVersion),
+			Status:        C.CString(secret.Secret.Status),
+			CreatedAt:     C.longlong(secret.Secret.CreatedAt.Unix()),
+		},
+		Version:   C.int(secret.Version),
+		Data:      C.CString(string(secret.Data)),
+		CreatedAt: C.longlong(secret.CreatedAt.Unix()),
+		Status:    C.CString(secret.Status),
 	}
 }
 

@@ -47,8 +47,21 @@ extern bool Exists(char* path, char** errMessage);
 extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
 
+extern struct Secret {
+	uuid SecretID;
+	uuid DirID;
+	uuid RepoID;
+	char* Name;
+	char* BlindName;
+	int VersionCount;
+	int LatestVersion;
+	char* Status;
+	time CreatedAt;
+};
+
 extern struct SecretVersion {
 	uuid SecretVersionID;
+	struct Secret Secret;
     int Version;
     char* Data;
     time CreatedAt;
