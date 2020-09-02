@@ -2,8 +2,11 @@ package main
 
 import (
 	"C"
-	"github.com/secrethub/secrethub-go/pkg/secrethub"
+	"encoding/json"
+	"os"
 	"strings"
+
+	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
 // Read retrieves a secret from SecretHub, given its path.
@@ -45,17 +48,71 @@ func Resolve(ref *C.char, errMessage **C.char) *C.char {
 	return ref
 }
 
-/*
 // ResolveEnv takes a map of environment variables and replaces the values of those
 // which store references of secrets in SecretHub (`secrethub://<path>`) with the value
 // of the respective secret. The other entries in the map remain untouched.
 //export ResolveEnv
-func ResolveEnv(envVars map[string]string) map[string]string {
+func ResolveEnv(errMessage **C.char) *C.char {
+	envVars := os.Environ()
 	resolvedEnv := make(map[string]string, len(envVars))
-	for key, value := range envVars {
-		resolvedEnv[key] = string(Resolve(value))
+	for _, value := range envVars {
+		keyValue := strings.Split(value, "=")
+		resolvedEnv[keyValue[0]] = C.GoString(Resolve(keyValue[1], errMessage))
 	}
-	return resolvedEnv
-}*/
+	encoding, err := json.Marshal(resolvedEnv)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	return C.CString(encoding)
+}
+
+// Exists checks if a secret exists at `path`.
+//export Exists
+func Exists(path *C.char, errMessage **C.char) C.BOOL {
+	client, err := secrethub.NewClient()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	exists, err := client.Secrets().Exists(C.GoString(path))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	if exists {
+		return C.BOOL(1)
+	} else {
+		return C.BOOL(0)
+	}
+}
+
+// Remove deletes the secret found at `path`, if it exists.
+//export Remove
+func Remove(path *C.char, errMessage **C.char) {
+	client, err := secrethub.NewClient()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return
+	}
+	err = client.Secrets().Delete(path)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+	}
+}
+
+// Write writes a secret containing the contents of `secret` at `path`.
+//export Write
+func Write(path *C.char, secret *C.char, errMessage **C.char) {
+	client, err := secrethub.NewClient()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return
+	}
+	_, err = client.Secrets().Write(C.GoString(path), []byte(C.GoString(secret)))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+	}
+}
 
 func main() {}
