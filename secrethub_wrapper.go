@@ -1,11 +1,13 @@
 package main
 
 /*
+typedef long long time;
+typedef char* uuid;
 struct SecretVersion {
-	char* SecretVersionID;
+	uuid SecretVersionID;
 	int Version;
 	char* Data;
-	long long CreatedAt;
+	time CreatedAt;
 	char* Status;
 };
 #include <stdbool.h>

@@ -16,25 +16,27 @@
   }
 }
 
-%typemap(cstype) long long SecretVersion::CreatedAt "System.DateTime"
-%typemap(csvarout, excode=SWIGEXCODE) long long SecretVersion::CreatedAt %{
+%apply long long { time };
+%typemap(cstype) time "System.DateTime"
+%typemap(csvarout, excode=SWIGEXCODE) time %{
     get {
         System.DateTime ret = System.DateTimeOffset.FromUnixTimeSeconds($imcall).UtcDateTime;$excode
         return ret;
     }
 %}
-%typemap(csvarin, excode=SWIGEXCODE) long long SecretVersion::CreatedAt %{
-    // SecretVersion.CreatedAt is read only
+%typemap(csvarin, excode=SWIGEXCODE) time %{
+    // time is read only
 %}
 
-%typemap(cstype) char* SecretVersion::SecretVersionID "System.Guid"
-%typemap(csvarout, excode=SWIGEXCODE) char* SecretVersion::SecretVersionID %{
+%apply char* { uuid };
+%typemap(cstype) uuid "System.Guid"
+%typemap(csvarout, excode=SWIGEXCODE) uuid %{
     get {
         System.Guid ret = System.Guid.Parse($imcall);$excode
         return ret;
     }
 %}
-%typemap(csvarin, excode=SWIGEXCODE) char* SecretVersion::SecretVersionID %{
+%typemap(csvarin, excode=SWIGEXCODE) uuid %{
     // SecretVersion.SecretVersionID is read only
 %}
 
@@ -46,9 +48,9 @@ extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
 
 extern struct SecretVersion {
-	char* SecretVersionID;
+	uuid SecretVersionID;
     int Version;
     char* Data;
-    long long CreatedAt;
+    time CreatedAt;
 	char* Status;
 };
