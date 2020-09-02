@@ -1,9 +1,9 @@
 package main
 
+// #include <stdbool.h>
+import "C"
+
 import (
-	"C"
-	"encoding/json"
-	"os"
 	"strings"
 
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
@@ -48,6 +48,7 @@ func Resolve(ref *C.char, errMessage **C.char) *C.char {
 	return ref
 }
 
+/*
 // ResolveEnv takes a map of environment variables and replaces the values of those
 // which store references of secrets in SecretHub (`secrethub://<path>`) with the value
 // of the respective secret. The other entries in the map remain untouched.
@@ -66,25 +67,22 @@ func ResolveEnv(errMessage **C.char) *C.char {
 	}
 	return C.CString(encoding)
 }
+*/
 
 // Exists checks if a secret exists at `path`.
 //export Exists
-func Exists(path *C.char, errMessage **C.char) C.BOOL {
+func Exists(path *C.char, errMessage **C.char) C.bool {
 	client, err := secrethub.NewClient()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
-		return nil
+		return C.bool(false)
 	}
 	exists, err := client.Secrets().Exists(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
-		return nil
+		return C.bool(false)
 	}
-	if exists {
-		return C.BOOL(1)
-	} else {
-		return C.BOOL(0)
-	}
+	return C.bool(exists)
 }
 
 // Remove deletes the secret found at `path`, if it exists.
@@ -95,7 +93,7 @@ func Remove(path *C.char, errMessage **C.char) {
 		*errMessage = C.CString(err.Error())
 		return
 	}
-	err = client.Secrets().Delete(path)
+	err = client.Secrets().Delete(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 	}
