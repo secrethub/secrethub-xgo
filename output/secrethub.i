@@ -19,6 +19,7 @@
 
 extern char *Read(char* path, char** errMessage);
 extern char *Resolve(char* path, char** errMessage);
+extern char *ResolveEnv(char** errMessage)
 extern bool Exists(char* path, char** errMessage);
 extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
