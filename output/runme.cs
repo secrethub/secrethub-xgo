@@ -4,6 +4,7 @@ using System;
         Secret secret = secrethub.Read("secrethub-xgo/dotnet/test-secret");
         Console.WriteLine("Version: {0}", secret.Version);
         Console.WriteLine("Data: {0}", secret.Data);
+        Console.WriteLine("Created At: {0}", secret.CreatedAt);
          try {
              Console.WriteLine(secrethub.ReadString("secrethub-xgo/dotnet/test-secret"));
              Console.WriteLine(secrethub.ReadString("secrethub-xgo/dotnet/non-existent-secret"));

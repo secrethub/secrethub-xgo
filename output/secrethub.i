@@ -4,7 +4,6 @@
 %}
 %include exception.i
 #include "secrethub.h"
-#include <stdio.h>
 
 %typemap(in, numinputs=0) char **errMessage (char *temp="") {
   $1 = &temp;
@@ -17,6 +16,17 @@
   }
 }
 
+%typemap(cstype) long Secret::CreatedAt "System.DateTime"
+%typemap(csvarout, excode=SWIGEXCODE) long Secret::CreatedAt %{
+get {
+    System.DateTime ret = System.DateTimeOffset.FromUnixTimeSeconds($imcall).UtcDateTime;$excode
+    return ret;
+}
+%}
+%typemap(csvarin, excode=SWIGEXCODE) long Secret::CreatedAt %{
+// Secret.CreatedAt is read only
+%}
+
 extern struct Secret Read(char* path, char** errMessage);
 extern char* ReadString(char* path, char** errMessage);
 extern char* Resolve(char* path, char** errMessage);
@@ -24,7 +34,8 @@ extern bool Exists(char* path, char** errMessage);
 extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
 
-extern struct Secret{
+extern struct Secret {
     int Version;
     char* Data;
+    long CreatedAt;
 };
