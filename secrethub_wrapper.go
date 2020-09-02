@@ -1,15 +1,18 @@
 package main
+
 /*
 struct Secret {
 	int Version;
 	char* Data;
 };
- */
+#include <stdbool.h>
+*/
 import "C"
 
 import (
-	"github.com/secrethub/secrethub-go/pkg/secrethub"
 	"strings"
+
+	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
 // Read retrieves a secret by its path.
@@ -27,7 +30,7 @@ func Read(path *C.char, errMessage **C.char) C.struct_Secret {
 	}
 	return C.struct_Secret{
 		Version: C.int(secret.Version),
-		Data: C.CString(string(secret.Data)),
+		Data:    C.CString(string(secret.Data)),
 	}
 }
 
@@ -80,5 +83,49 @@ func ResolveEnv(envVars map[string]string) map[string]string {
 	}
 	return resolvedEnv
 }*/
+
+// Exists checks if a secret exists at `path`.
+//export Exists
+func Exists(path *C.char, errMessage **C.char) C.bool {
+	client, err := secrethub.NewClient()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return C.bool(false)
+	}
+	exists, err := client.Secrets().Exists(C.GoString(path))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return C.bool(false)
+	}
+	return C.bool(exists)
+}
+
+// Remove deletes the secret found at `path`, if it exists.
+//export Remove
+func Remove(path *C.char, errMessage **C.char) {
+	client, err := secrethub.NewClient()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return
+	}
+	err = client.Secrets().Delete(C.GoString(path))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+	}
+}
+
+// Write writes a secret containing the contents of `secret` at `path`.
+//export Write
+func Write(path *C.char, secret *C.char, errMessage **C.char) {
+	client, err := secrethub.NewClient()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return
+	}
+	_, err = client.Secrets().Write(C.GoString(path), []byte(C.GoString(secret)))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+	}
+}
 
 func main() {}
