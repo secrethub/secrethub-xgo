@@ -2,6 +2,7 @@ package main
 
 /*
 struct Secret {
+	char* SecretVersionID;
 	int Version;
 	char* Data;
 	long long CreatedAt;
@@ -30,9 +31,10 @@ func Read(path *C.char, errMessage **C.char) C.struct_Secret {
 		return C.struct_Secret{}
 	}
 	return C.struct_Secret{
-		Version:   C.int(secret.Version),
-		Data:      C.CString(string(secret.Data)),
-		CreatedAt: C.longlong(secret.CreatedAt.Unix()),
+		SecretVersionID: C.CString(secret.SecretVersionID.String()),
+		Version:         C.int(secret.Version),
+		Data:            C.CString(string(secret.Data)),
+		CreatedAt:       C.longlong(secret.CreatedAt.Unix()),
 	}
 }
 
