@@ -18,13 +18,13 @@
 
 %typemap(cstype) long long Secret::CreatedAt "System.DateTime"
 %typemap(csvarout, excode=SWIGEXCODE) long long Secret::CreatedAt %{
-get {
-    System.DateTime ret = System.DateTimeOffset.FromUnixTimeSeconds($imcall).UtcDateTime;$excode
-    return ret;
-}
+    get {
+        System.DateTime ret = System.DateTimeOffset.FromUnixTimeSeconds($imcall).UtcDateTime;$excode
+        return ret;
+    }
 %}
 %typemap(csvarin, excode=SWIGEXCODE) long long Secret::CreatedAt %{
-// Secret.CreatedAt is read only
+    // Secret.CreatedAt is read only
 %}
 
 extern struct Secret Read(char* path, char** errMessage);
