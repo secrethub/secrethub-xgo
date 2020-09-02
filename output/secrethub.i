@@ -16,36 +16,36 @@
   }
 }
 
-%typemap(cstype) long long Secret::CreatedAt "System.DateTime"
-%typemap(csvarout, excode=SWIGEXCODE) long long Secret::CreatedAt %{
+%typemap(cstype) long long SecretVersion::CreatedAt "System.DateTime"
+%typemap(csvarout, excode=SWIGEXCODE) long long SecretVersion::CreatedAt %{
     get {
         System.DateTime ret = System.DateTimeOffset.FromUnixTimeSeconds($imcall).UtcDateTime;$excode
         return ret;
     }
 %}
-%typemap(csvarin, excode=SWIGEXCODE) long long Secret::CreatedAt %{
-    // Secret.CreatedAt is read only
+%typemap(csvarin, excode=SWIGEXCODE) long long SecretVersion::CreatedAt %{
+    // SecretVersion.CreatedAt is read only
 %}
 
-%typemap(cstype) char* Secret::SecretVersionID "System.Guid"
-%typemap(csvarout, excode=SWIGEXCODE) char* Secret::SecretVersionID %{
+%typemap(cstype) char* SecretVersion::SecretVersionID "System.Guid"
+%typemap(csvarout, excode=SWIGEXCODE) char* SecretVersion::SecretVersionID %{
     get {
         System.Guid ret = System.Guid.Parse($imcall);$excode
         return ret;
     }
 %}
-%typemap(csvarin, excode=SWIGEXCODE) char* Secret::SecretVersionID %{
-    // Secret.SecretVersionID is read only
+%typemap(csvarin, excode=SWIGEXCODE) char* SecretVersion::SecretVersionID %{
+    // SecretVersion.SecretVersionID is read only
 %}
 
-extern struct Secret Read(char* path, char** errMessage);
+extern struct SecretVersion Read(char* path, char** errMessage);
 extern char* ReadString(char* path, char** errMessage);
 extern char* Resolve(char* path, char** errMessage);
 extern bool Exists(char* path, char** errMessage);
 extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
 
-extern struct Secret {
+extern struct SecretVersion {
 	char* SecretVersionID;
     int Version;
     char* Data;

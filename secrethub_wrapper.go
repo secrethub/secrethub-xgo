@@ -1,7 +1,7 @@
 package main
 
 /*
-struct Secret {
+struct SecretVersion {
 	char* SecretVersionID;
 	int Version;
 	char* Data;
@@ -20,18 +20,18 @@ import (
 
 // Read retrieves a secret by its path.
 //export Read
-func Read(path *C.char, errMessage **C.char) C.struct_Secret {
+func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 	client, err := secrethub.NewClient()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
-		return C.struct_Secret{}
+		return C.struct_SecretVersion{}
 	}
 	secret, err := client.Secrets().Read(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
-		return C.struct_Secret{}
+		return C.struct_SecretVersion{}
 	}
-	return C.struct_Secret{
+	return C.struct_SecretVersion{
 		SecretVersionID: C.CString(secret.SecretVersionID.String()),
 		Version:         C.int(secret.Version),
 		Data:            C.CString(string(secret.Data)),
