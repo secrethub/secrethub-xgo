@@ -1,7 +1,7 @@
 using System;
  public class runme {
      static void Main() {
-        SecretVersion secret = secrethub.Read("secrethub-xgo/dotnet/test-secret");
+        SecretVersion secret = secrethub.Read("teddy2008/demo/username");
         Console.WriteLine("Version ID: {0}", secret.SecretVersionID);
         Console.WriteLine("Secret ID: {0}", secret.Secret.SecretID);
         Console.WriteLine("Version: {0}", secret.Version);
@@ -10,8 +10,8 @@ using System;
         Console.WriteLine("Secret Created At: {0}", secret.Secret.CreatedAt);
         Console.WriteLine("Status: {0}", secret.Status);
          try {
-             Console.WriteLine(secrethub.ReadString("secrethub-xgo/dotnet/test-secret"));
-             Console.WriteLine(secrethub.ReadString("secrethub-xgo/dotnet/non-existent-secret"));
+             Console.WriteLine(secrethub.ReadString("teddy2008/demo/username"));
+             Console.WriteLine(secrethub.ReadString("teddy2008/demo/non-existent-secret"));
          } catch (Exception e) {
              Console.WriteLine("Exception caught: {0}", e);
         }
