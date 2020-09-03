@@ -45,3 +45,4 @@ clear:
 .PHONY: clean
 clean: clear
 	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libsecrethub.so)
+
