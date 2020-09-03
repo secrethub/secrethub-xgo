@@ -1,13 +1,14 @@
-CGO_FILES=secrethub.a secrethub.h go.sum
-SWIG_FILES=secrethub.cs secrethub_wrap.c secrethubPINVOKE.cs Secret.cs SecretVersion.cs
-OUT_FILES=secrethub_wrap.o
-MONO_FILES=runme.exe
-DOTNET_FILES=secrethub secrethub.deps.json secrethub.dll secrethub.pdb secrethub.runtimeconfig.json
-SWIG=swig
-CC=gcc
-ODIR=./output
-DEPS=$(ODIR)/secrethub_wrap.c $(ODIR)/secrethub.h
-OBJ=$(ODIR)/secrethub_wrap.o $(ODIR)/secrethub.a
+CGO_FILES = secrethub.a secrethub.h go.sum
+SWIG_FILES = secrethub.cs secrethub_wrap.c secrethubPINVOKE.cs Secret.cs SecretVersion.cs
+OUT_FILES = secrethub_wrap.o
+MONO_FILES = runme.exe
+DOTNET_FILES = secrethub secrethub.deps.json secrethub.dll secrethub.pdb secrethub.runtimeconfig.json
+DOTNET_DIRS = $(ODIR)/bin $(ODIR)/obj
+SWIG = swig
+CC = gcc
+ODIR = ./output
+DEPS = $(ODIR)/secrethub_wrap.c $(ODIR)/secrethub.h
+OBJ = $(ODIR)/secrethub_wrap.o $(ODIR)/secrethub.a
 
 all: client swig compile
 
@@ -27,7 +28,7 @@ compile: $(DEPS)
 .PHONY: dotnet
 dotnet: client swig compile
 	dotnet publish $(ODIR)/secrethub.csproj -o $(ODIR)
-	rm -r $(ODIR)/bin $(ODIR)/obj
+	rm -r $(DOTNET_DIRS)
 	$(MAKE) clear
 # 	dotnet $(ODIR)/secrethub.dll
 
@@ -37,6 +38,17 @@ mono: client swig compile
 	$(MAKE) clear
 # 	mono ./$(ODIR)/runme.exe
 
+.PHONY: nupkg
+nupkg: client swig
+	dotnet pack $(ODIR)/secrethub.csproj
+	mv $(ODIR)/bin/Debug/*.nupkg $(ODIR)
+	rm -r $(DOTNET_DIRS)
+	$(MAKE) clear
+
+#.PHONY: nupkg-publish
+#nupkg-publish: nupkg
+	#dotnet nuget push $(ODIR)/*.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
+
 .PHONY: clear
 clear:
 	rm -f go.sum
@@ -44,5 +56,5 @@ clear:
 
 .PHONY: clean
 clean: clear
-	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libsecrethub.so)
+	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libsecrethub.so *.nupkg)
 
