@@ -34,10 +34,20 @@ import (
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
+func getVersion() []secrethub.ClientOption {
+	options := []secrethub.ClientOption{
+		secrethub.WithAppInfo(&secrethub.AppInfo{
+			Name:    "secrethub-xgo",
+			Version: "1.0.0",
+		}),
+	}
+	return options
+}
+
 // Read retrieves a secret by its path.
 //export Read
 func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
-	client, err := secrethub.NewClient()
+	client, err := secrethub.NewClient(getVersion()...)
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return C.struct_SecretVersion{}
@@ -70,7 +80,7 @@ func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 // ReadString retrieves a secret as a string.
 //export ReadString
 func ReadString(path *C.char, errMessage **C.char) *C.char {
-	client, err := secrethub.NewClient()
+	client, err := secrethub.NewClient(getVersion()...)
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
@@ -87,7 +97,7 @@ func ReadString(path *C.char, errMessage **C.char) *C.char {
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
 func Resolve(ref *C.char, errMessage **C.char) *C.char {
-	client, err := secrethub.NewClient()
+	client, err := secrethub.NewClient(getVersion()...)
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
