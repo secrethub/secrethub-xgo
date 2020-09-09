@@ -34,7 +34,7 @@ compile: $(DEPS)
 .PHONY: compile-win
 compile-win: $(DEPS)
 	x86_64-w64-mingw32-gcc -c -O2 -fpic -o $(ODIR)/secrethub_wrap.o $(ODIR)/secrethub_wrap.c
-	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(ODIR)/libClient.dll
+	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(ODIR)/Client.dll
 
 .PHONY: dotnet-test
 dotnet: $(ODIR)/libClient.so
@@ -50,7 +50,7 @@ mono: $(ODIR)/libClient.so
 .PHONY: nupkg
 nupkg: lib lib-win
 	mkdir nuget
-	cp $(ODIR)/{libClient.dll,libClient.so,Secret.cs,Client.cs,ClientPINVOKE.cs,SecretVersion.cs,secrethub.csproj} ./nuget/
+	cp $(ODIR)/{Client.dll,libClient.so,Secret.cs,Client.cs,ClientPINVOKE.cs,SecretVersion.cs,secrethub.csproj} ./nuget/
 	dotnet pack nuget/secrethub.csproj
 	mv ./nuget/bin/Debug/SecretHub.*.nupkg .
 	rm -r ./nuget
@@ -69,4 +69,4 @@ deps:
 clean:
 	rm -f go.sum
 	rm -f $(addprefix $(ODIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES)) 
-	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libClient.so libClient.dll)
+	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libClient.so Client.dll)
