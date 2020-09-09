@@ -34,6 +34,7 @@ import (
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
+// Client creates and returns a new Go client to be used by xgo clients.
 func Client() (*secrethub.Client, error) {
 	options := []secrethub.ClientOption{
 		secrethub.WithAppInfo(&secrethub.AppInfo{
