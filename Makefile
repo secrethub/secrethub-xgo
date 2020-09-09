@@ -25,17 +25,15 @@ compile: $(DEPS)
 	$(CC) -c -O2 -fpic -o $(ODIR)/secrethub_wrap.o $(ODIR)/secrethub_wrap.c
 	$(CC) -shared -fPIC $(OBJ) -o $(ODIR)/libsecrethub.so
 
-.PHONY: dotnet
-dotnet: client swig compile
+.PHONY: dotnet-test
+dotnet: $(ODIR)/libsecrethub.so
 	dotnet publish $(ODIR)/secrethub.csproj -o $(ODIR)
-	rm -r $(DOTNET_DIRS)
-	$(MAKE) clear
+	rm -r $(ODIR)/bin $(ODIR)/obj
 # 	dotnet $(ODIR)/secrethub.dll
 
-.PHONY: mono
-mono: client swig compile
+.PHONY: mono-test
+mono: $(ODIR)/libsecrethub.so
 	mono-csc -out:$(ODIR)/runme.exe $(ODIR)/*.cs
-	$(MAKE) clear
 # 	mono ./$(ODIR)/runme.exe
 
 .PHONY: nupkg
@@ -51,12 +49,8 @@ nupkg: client swig compile
 #nupkg-publish: nupkg
 	#dotnet nuget push $(ODIR)/*.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
 
-.PHONY: clear
-clear:
+.PHONY: clean
+clean:
 	rm -f go.sum
 	rm -f $(addprefix $(ODIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES)) 
-
-.PHONY: clean
-clean: clear
 	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libsecrethub.so *.nupkg)
-
