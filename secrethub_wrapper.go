@@ -39,7 +39,7 @@ func Client() (*secrethub.Client, error) {
 	options := []secrethub.ClientOption{
 		secrethub.WithAppInfo(&secrethub.AppInfo{
 			Name:    "secrethub-xgo",
-			Version: "1.0.0",
+			Version: "0.1.0",
 		}),
 	}
 	client, err := secrethub.NewClient(options...)
