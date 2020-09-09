@@ -1,9 +1,9 @@
-%module secrethub
+%module Client
 %{
-#include "secrethub.h"
+#include "Client.h"
 %}
 %include exception.i
-#include "secrethub.h"
+#include "Client.h"
 
 // Handle error message output parameters.
 %typemap(in, numinputs=0) char **errMessage (char *temp="") {
