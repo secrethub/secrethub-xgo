@@ -44,7 +44,7 @@ nupkg: client swig compile
 	mv ./nuget/bin/Debug/SecretHub.*.nupkg .
 	rm -r ./nuget
 	rm $(ODIR)/libsecrethub.so
-
+	make clean
 #.PHONY: nupkg-publish
 #nupkg-publish: nupkg
 	#dotnet nuget push $(ODIR)/*.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
