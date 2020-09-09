@@ -60,6 +60,11 @@ nupkg: lib lib-win
 #nupkg-publish: nupkg
 	#dotnet nuget push $(ODIR)/*.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
 
+.PHONY: deps
+deps:
+	sudo apt install gcc
+	sudo apt install gcc-mingw-w64
+
 .PHONY: clean
 clean:
 	rm -f go.sum
