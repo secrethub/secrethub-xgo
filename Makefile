@@ -10,6 +10,7 @@ CC = gcc
 ODIR = ./output
 DEPS = $(ODIR)/secrethub_wrap.c $(ODIR)/secrethub.h
 OBJ = $(ODIR)/secrethub_wrap.o $(ODIR)/secrethub.a
+
 all: client swig compile
 
 .PHONY: client
@@ -53,4 +54,4 @@ nupkg: client swig compile
 clean:
 	rm -f go.sum
 	rm -f $(addprefix $(ODIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES)) 
-	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libsecrethub.so *.nupkg)
+	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libsecrethub.so)

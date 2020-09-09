@@ -34,10 +34,22 @@ import (
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
+// Client creates and returns a new Go client to be used by xgo clients.
+func Client() (*secrethub.Client, error) {
+	options := []secrethub.ClientOption{
+		secrethub.WithAppInfo(&secrethub.AppInfo{
+			Name:    "secrethub-xgo",
+			Version: "1.0.0",
+		}),
+	}
+	client, err := secrethub.NewClient(options...)
+	return client, err
+}
+
 // Read retrieves a secret by its path.
 //export Read
 func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return C.struct_SecretVersion{}
@@ -70,7 +82,7 @@ func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 // ReadString retrieves a secret as a string.
 //export ReadString
 func ReadString(path *C.char, errMessage **C.char) *C.char {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
@@ -87,7 +99,7 @@ func ReadString(path *C.char, errMessage **C.char) *C.char {
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
 func Resolve(ref *C.char, errMessage **C.char) *C.char {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
@@ -120,7 +132,7 @@ func ResolveEnv(envVars map[string]string) map[string]string {
 // Exists checks if a secret exists at `path`.
 //export Exists
 func Exists(path *C.char, errMessage **C.char) C.bool {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return C.bool(false)
@@ -136,7 +148,7 @@ func Exists(path *C.char, errMessage **C.char) C.bool {
 // Remove deletes the secret found at `path`, if it exists.
 //export Remove
 func Remove(path *C.char, errMessage **C.char) {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return
@@ -150,7 +162,7 @@ func Remove(path *C.char, errMessage **C.char) {
 // Write writes a secret containing the contents of `secret` at `path`.
 //export Write
 func Write(path *C.char, secret *C.char, errMessage **C.char) {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return
