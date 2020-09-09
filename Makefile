@@ -38,12 +38,12 @@ mono: $(ODIR)/libsecrethub.so
 
 .PHONY: nupkg
 nupkg: client swig compile
+	mkdir nuget
 	cp $(ODIR)/{libsecrethub.so,Secret.cs,secrethub.cs,secrethubPINVOKE.cs,SecretVersion.cs,secrethub.csproj} ./nuget/
 	dotnet pack nuget/secrethub.csproj
 	mv ./nuget/bin/Debug/SecretHub.*.nupkg .
-	rm -r ./nuget/*
+	rm -r ./nuget
 	rm $(ODIR)/libsecrethub.so
-	$(MAKE) clear
 
 #.PHONY: nupkg-publish
 #nupkg-publish: nupkg
