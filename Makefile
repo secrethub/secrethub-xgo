@@ -11,11 +11,16 @@ ODIR = ./output
 DEPS = $(ODIR)/secrethub_wrap.c $(ODIR)/Client.h
 OBJ = $(ODIR)/secrethub_wrap.o $(ODIR)/Client.a
 
-all: client swig compile
+lib: client swig compile
+lib-win: client-win swig compile-win
 
 .PHONY: client
 client: secrethub_wrapper.go
 	go build -o output/Client.a -buildmode=c-archive secrethub_wrapper.go
+
+.PHONY: client-win
+client-win: secrethub_wrapper.go
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -o output/Client.a -buildmode=c-archive secrethub_wrapper.go
 
 .PHONY: swig
 swig:
@@ -25,6 +30,11 @@ swig:
 compile: $(DEPS)
 	$(CC) -c -O2 -fpic -o $(ODIR)/secrethub_wrap.o $(ODIR)/secrethub_wrap.c
 	$(CC) -shared -fPIC $(OBJ) -o $(ODIR)/libClient.so
+
+.PHONY: compile-win
+compile-win: $(DEPS)
+	x86_64-w64-mingw32-gcc -c -O2 -fpic -o $(ODIR)/secrethub_wrap.o $(ODIR)/secrethub_wrap.c
+	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(ODIR)/libClient.dll
 
 .PHONY: dotnet-test
 dotnet: $(ODIR)/libClient.so
@@ -38,9 +48,9 @@ mono: $(ODIR)/libClient.so
 # 	mono ./$(ODIR)/runme.exe
 
 .PHONY: nupkg
-nupkg: client swig compile
+nupkg: lib lib-win
 	mkdir nuget
-	cp $(ODIR)/{libClient.so,Secret.cs,Client.cs,ClientPINVOKE.cs,SecretVersion.cs,secrethub.csproj} ./nuget/
+	cp $(ODIR)/{libClient.dll,libClient.so,Secret.cs,Client.cs,ClientPINVOKE.cs,SecretVersion.cs,secrethub.csproj} ./nuget/
 	dotnet pack nuget/secrethub.csproj
 	mv ./nuget/bin/Debug/SecretHub.*.nupkg .
 	rm -r ./nuget
@@ -54,4 +64,4 @@ nupkg: client swig compile
 clean:
 	rm -f go.sum
 	rm -f $(addprefix $(ODIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES)) 
-	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libClient.so)
+	rm -f $(addprefix $(ODIR)/, $(MONO_FILES) $(DOTNET_FILES) libClient.so libClient.dll)
