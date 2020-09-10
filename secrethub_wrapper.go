@@ -1,6 +1,31 @@
 package main
 
-// #include <stdbool.h>
+/*
+typedef long long time;
+typedef char* uuid;
+
+struct Secret {
+	uuid SecretID;
+	uuid DirID;
+	uuid RepoID;
+	char* Name;
+	char* BlindName;
+	int VersionCount;
+	int LatestVersion;
+	char* Status;
+	time CreatedAt;
+};
+
+struct SecretVersion {
+	uuid SecretVersionID;
+	struct Secret Secret;
+	int Version;
+	char* Data;
+	time CreatedAt;
+	char* Status;
+};
+#include <stdbool.h>
+*/
 import "C"
 
 import (
@@ -11,12 +36,55 @@ import (
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
-// Read retrieves a secret from SecretHub, given its path.
-// It throws an error if it fails to initialize the SecretHub client
-// or if it fails to retrieve the secret.
+// Client creates and returns a new Go client to be used by xgo clients.
+func Client() (*secrethub.Client, error) {
+	options := []secrethub.ClientOption{
+		secrethub.WithAppInfo(&secrethub.AppInfo{
+			Name:    "secrethub-xgo",
+			Version: "0.1.0",
+		}),
+	}
+	client, err := secrethub.NewClient(options...)
+	return client, err
+}
+
+// Read retrieves a secret by its path.
 //export Read
-func Read(path *C.char, errMessage **C.char) *C.char {
-	client, err := secrethub.NewClient()
+func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
+	client, err := Client()
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return C.struct_SecretVersion{}
+	}
+	secret, err := client.Secrets().Read(C.GoString(path))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return C.struct_SecretVersion{}
+	}
+	return C.struct_SecretVersion{
+		SecretVersionID: C.CString(secret.SecretVersionID.String()),
+		Secret: C.struct_Secret{
+			SecretID:      C.CString(secret.Secret.SecretID.String()),
+			DirID:         C.CString(secret.Secret.DirID.String()),
+			RepoID:        C.CString(secret.Secret.RepoID.String()),
+			Name:          C.CString(secret.Secret.Name),
+			BlindName:     C.CString(secret.Secret.BlindName),
+			VersionCount:  C.int(secret.Secret.VersionCount),
+			LatestVersion: C.int(secret.Secret.LatestVersion),
+			Status:        C.CString(secret.Secret.Status),
+			CreatedAt:     C.longlong(secret.Secret.CreatedAt.Unix()),
+		},
+		Version:   C.int(secret.Version),
+		Data:      C.CString(string(secret.Data)),
+		CreatedAt: C.longlong(secret.CreatedAt.Unix()),
+		Status:    C.CString(secret.Status),
+	}
+}
+
+// ReadString retrieves a secret as a string.
+//export ReadString
+func ReadString(path *C.char, errMessage **C.char) *C.char {
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
@@ -33,7 +101,7 @@ func Read(path *C.char, errMessage **C.char) *C.char {
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
 func Resolve(ref *C.char, errMessage **C.char) *C.char {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
@@ -72,7 +140,7 @@ func ResolveEnv(errMessage **C.char) *C.char {
 // Exists checks if a secret exists at `path`.
 //export Exists
 func Exists(path *C.char, errMessage **C.char) C.bool {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return C.bool(false)
@@ -88,7 +156,7 @@ func Exists(path *C.char, errMessage **C.char) C.bool {
 // Remove deletes the secret found at `path`, if it exists.
 //export Remove
 func Remove(path *C.char, errMessage **C.char) {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return
@@ -102,7 +170,7 @@ func Remove(path *C.char, errMessage **C.char) {
 // Write writes a secret containing the contents of `secret` at `path`.
 //export Write
 func Write(path *C.char, secret *C.char, errMessage **C.char) {
-	client, err := secrethub.NewClient()
+	client, err := Client()
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return
