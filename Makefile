@@ -1,4 +1,5 @@
 SHELL = bash
+SWIG_VERSION = 4.0.2
 CGO_FILES = Client.a Client.h
 SWIG_FILES = Client.cs secrethub_wrap.c ClientPINVOKE.cs Secret.cs SecretVersion.cs
 OUT_FILES = secrethub_wrap.o libClient.so Client.dll
@@ -42,9 +43,24 @@ nupkg: lib lib-win
 	#dotnet nuget push *.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
 
 .PHONY: deps
+.ONESHELL:
 deps:
+	# install gcc
 	sudo apt install gcc
 	sudo apt install gcc-mingw-w64
+	# install pcre
+	sudo apt install libpcre3-dev
+	# install swig
+	sudo apt install swig
+# 	wget https://downloads.sourceforge.net/swig/swig-$(SWIG_VERSION).tar.gz
+# 	mkdir -p swig && tar -xzvf swig-$(SWIG_VERSION).tar.gz -C swig --strip-components 1
+# 	cd swig
+# 	./configure; sudo make; sudo make install
+# 	cd ..; rm -rf swig; rm -f swig-$(SWIG_VERSION).tar.gz
+# 	echo "export SWIG_PATH=usr/local/share/swig/bin" | sudo tee -a /etc/profile
+# 	echo "export PATH=$(SWIG_PATH):$(PATH)" | sudo tee -a /etc/profile
+# 	source /etc/profile
+
 
 .PHONY: clean
 clean:
