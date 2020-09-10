@@ -1,6 +1,7 @@
 SHELL = bash
 CGO_FILES = Client.a Client.h
 SWIG_FILES = Client.cs secrethub_wrap.c ClientPINVOKE.cs Secret.cs SecretVersion.cs
+TEST_FILES = Client.cs ClientPINVOKE.cs Secret.cs SecretVersion.cs
 OUT_FILES = secrethub_wrap.o libClient.so Client.dll
 ODIR = ./dotnet
 DEPS = $(ODIR)/secrethub_wrap.c $(ODIR)/Client.h
@@ -33,7 +34,7 @@ compile-win: $(DEPS)
 
 .PHONY: dotnet-test
 dotnet-test: $(ODIR)/libClient.so
-	dotnet publish $(ODIR)/secrethub.csproj -o $(ODIR)/build -f netcoreapp3.1 --nologo
+	dotnet publish $(ODIR)/secrethub.csproj -o $(ODIR)/build --nologo
 	mv $(ODIR)/libClient.so $(ODIR)/build 
 # 	dotnet $(ODIR)/build/secrethub.dll
 
@@ -41,6 +42,14 @@ dotnet-test: $(ODIR)/libClient.so
 nupkg: lib lib-win
 	dotnet pack $(ODIR)/secrethub.csproj -o $(ODIR)/build --nologo
 	mv $(ODIR)/build/SecretHub.*.nupkg .
+	make clean
+
+.PHONY: test
+test: lib lib-win
+	cp $(addprefix $(ODIR)/, $(TEST_FILES)) test
+	dotnet publish test/secrethub.csproj -o test/build --nologo
+	cp $(ODIR)/libClient.so test/build
+	dotnet test test/build/secrethub.dll --nologo
 	make clean
 
 #.PHONY: nupkg-publish
@@ -55,5 +64,5 @@ deps:
 .PHONY: clean
 clean:
 	rm -f go.sum
-	rm -f $(addprefix $(ODIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES))
-	rm -rf $(ODIR)/build $(ODIR)/bin $(ODIR)/obj
+	rm -f $(addprefix $(ODIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES)) $(addprefix test/, $(TEST_FILES))
+	rm -rf $(ODIR)/build $(ODIR)/bin $(ODIR)/obj test/build test/bin test/obj
