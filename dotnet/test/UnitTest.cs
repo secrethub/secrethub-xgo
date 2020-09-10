@@ -8,8 +8,17 @@ namespace SecretHubTest
         [Fact]
         public void TestReadSuccess()
         {
+            SecretHub.SecretVersion expectedSecret = new SecretHub.SecretVersion();
             SecretHub.SecretVersion secret = SecretHub.Client.Read("secrethub-xgo/dotnet/test-secret");
+            Assert.Equal(new Guid("a2628f70-dade-49b4-b4db-eca16c15e1d2"), secret.SecretVersionID);
+            Assert.Equal(new Guid("5b6a82f7-1b55-4e23-ac76-0a4f1d2fa826"), secret.Secret.SecretID);
+            Assert.Equal(2, secret.Version);
             Assert.Equal("super_secret_value", secret.Data);
+            Assert.Equal(DateTime.Parse("9/2/2020 2:11:49 PM",
+                          System.Globalization.CultureInfo.InvariantCulture), secret.CreatedAt);
+            Assert.Equal(DateTime.Parse("8/31/2020 2:39:50 PM",
+                          System.Globalization.CultureInfo.InvariantCulture), secret.Secret.CreatedAt);
+            Assert.Equal("ok", secret.Status);
         }
 
         [Fact]
@@ -21,14 +30,14 @@ namespace SecretHubTest
         }
 
         [Fact]
-        public void TestReadSecretSuccess()
+        public void TestReadStringSuccess()
         {
             string secret = SecretHub.Client.ReadString("secrethub-xgo/dotnet/test-secret");
             Assert.Equal("super_secret_value", secret);
         }
 
         [Fact]
-        public void TestReadSecretFail()
+        public void TestReadStringFail()
         {
             string errMessage = "cannot find secret: \"secrethub-xgo/dotnet/not-this-one\": Secret not found (server.secret_not_found) ";
             var ex = Assert.Throws<ApplicationException>(() => SecretHub.Client.ReadString("secrethub-xgo/dotnet/not-this-one"));
@@ -45,6 +54,14 @@ namespace SecretHubTest
         [InlineData("secrethub-xgo/dotnet/not-this-one", false)]
         public void TestExists(string path, bool expectedTestResult) {
             Assert.Equal(expectedTestResult, SecretHub.Client.Exists(path));
+        }
+
+        [Fact]
+        public void TestExistsException()
+        {
+            string errMessage = "secret path must be of the form <namespace>/<repo>[/<dir-path>]/<secret> got 'not-a-path' (api.invalid_secret_path) ";
+            var ex = Assert.Throws<ApplicationException>(() => SecretHub.Client.Exists("not-a-path"));
+            Assert.Equal(ex.Message, errMessage);
         }
 
         [Fact]
