@@ -43,7 +43,7 @@ dotnet-test: lib lib-win
 .PHONY: nupkg
 nupkg: lib lib-win
 	dotnet pack $(DOTNET_DIR)/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
-	mv $(DIR)/build/SecretHub.*.nupkg .
+	mv $(DOTNET_DIR)/build/SecretHub.*.nupkg .
 	make clean
 
 #.PHONY: nupkg-publish
