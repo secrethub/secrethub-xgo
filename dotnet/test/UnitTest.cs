@@ -1,5 +1,6 @@
 using System;
 using Xunit;
+using System.Text.RegularExpressions;
 
 namespace SecretHubTest
 {
@@ -24,9 +25,9 @@ namespace SecretHubTest
         [Fact]
         public void TestReadFail()
         {
-            string errMessage = "cannot find secret: \"secrethub-xgo/dotnet/not-this-one\": Secret not found (server.secret_not_found) ";
+            Regex expectedErrorRegex = new Regex(@"^.*\(server\.secret_not_found\) $");
             var ex = Assert.Throws<ApplicationException>(() => SecretHub.Client.Read("secrethub-xgo/dotnet/not-this-one"));
-            Assert.Equal(ex.Message, errMessage);
+            Assert.True(expectedErrorRegex.IsMatch(ex.Message), "error should end in the (server.secret_not_found) error code");
         }
 
         [Fact]
@@ -39,9 +40,9 @@ namespace SecretHubTest
         [Fact]
         public void TestReadStringFail()
         {
-            string errMessage = "cannot find secret: \"secrethub-xgo/dotnet/not-this-one\": Secret not found (server.secret_not_found) ";
+            Regex expectedErrorRegex = new Regex(@"^.*\(server\.secret_not_found\) $");
             var ex = Assert.Throws<ApplicationException>(() => SecretHub.Client.ReadString("secrethub-xgo/dotnet/not-this-one"));
-            Assert.Equal(ex.Message, errMessage);
+            Assert.True(expectedErrorRegex.IsMatch(ex.Message), "error should end in the (server.secret_not_found) error code");
         }
 
         [Fact]
@@ -59,9 +60,9 @@ namespace SecretHubTest
         [Fact]
         public void TestExistsException()
         {
-            string errMessage = "secret path must be of the form <namespace>/<repo>[/<dir-path>]/<secret> got 'not-a-path' (api.invalid_secret_path) ";
+            Regex expectedErrorRegex = new Regex(@"^.*\(api\.invalid_secret_path\) $");
             var ex = Assert.Throws<ApplicationException>(() => SecretHub.Client.Exists("not-a-path"));
-            Assert.Equal(ex.Message, errMessage);
+            Assert.True(expectedErrorRegex.IsMatch(ex.Message), "error should end in the (api.invalid_secret_path) error code");
         }
 
         [Fact]
@@ -82,9 +83,9 @@ namespace SecretHubTest
 
         [Fact]
         public void TestRemoveFail() {
-            string errMessage = "Secret not found (server.secret_not_found) ";
+            Regex expectedErrorRegex = new Regex(@"^.*\(server\.secret_not_found\) $");
             var ex = Assert.Throws<ApplicationException>(() => SecretHub.Client.Remove("secrethub-xgo/dotnet/not-this-one"));
-            Assert.Equal(ex.Message, errMessage);
+            Assert.True(expectedErrorRegex.IsMatch(ex.Message), "error should end in the (server.secret_not_found) error code");
         }
     }
 }
