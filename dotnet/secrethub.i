@@ -43,9 +43,19 @@
     // uuids are read only
 %}
 
+// Map return value of ResolveEnv to map[string]string.
+%typemap(cstype) char* ResolveEnv "System.Collections.Generic.Dictionary<string,string>"
+%typemap(csout, excode=SWIGEXCODE) char* ResolveEnv {
+    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, string>>($imcall);
+    $excode
+    return res;
+}
+
+
 extern struct SecretVersion Read(char* path, char** errMessage);
 extern char* ReadString(char* path, char** errMessage);
 extern char* Resolve(char* path, char** errMessage);
+extern char* ResolveEnv(char** errMessage);
 extern bool Exists(char* path, char** errMessage);
 extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);

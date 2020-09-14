@@ -50,6 +50,13 @@ namespace SecretHubTest
             Assert.Equal("super_secret_value", SecretHub.Client.Resolve("secrethub://secrethub-xgo/dotnet/test-secret"));  
         }
 
+        [Fact]
+        public void TestResolveEnvSuccess() {
+            System.Collections.Generic.IDictionary<string,string> res = SecretHub.Client.ResolveEnv();
+            Assert.Equal("super_secret_value", res["TEST"]);
+            Assert.Equal("aaaa", res["OTHER_TEST"]);
+        }
+
         [Theory]
         [InlineData("secrethub-xgo/dotnet/test-secret", true)]
         [InlineData("secrethub-xgo/dotnet/not-this-one", false)]

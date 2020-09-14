@@ -29,6 +29,8 @@ struct SecretVersion {
 import "C"
 
 import (
+	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
@@ -116,18 +118,27 @@ func Resolve(ref *C.char, errMessage **C.char) *C.char {
 	return ref
 }
 
-/*
 // ResolveEnv takes a map of environment variables and replaces the values of those
 // which store references of secrets in SecretHub (`secrethub://<path>`) with the value
 // of the respective secret. The other entries in the map remain untouched.
 //export ResolveEnv
-func ResolveEnv(envVars map[string]string) map[string]string {
+func ResolveEnv(errMessage **C.char) *C.char {
+	envVars := os.Environ()
 	resolvedEnv := make(map[string]string, len(envVars))
-	for key, value := range envVars {
-		resolvedEnv[key] = string(Resolve(value))
+	for _, value := range envVars {
+		envVar := strings.Split(value, "=")
+		key := envVar[0]
+		value := C.CString(envVar[1])
+		resolvedValue := Resolve(value, errMessage)
+		resolvedEnv[key] = C.GoString(resolvedValue)
 	}
-	return resolvedEnv
-}*/
+	encoding, err := json.Marshal(resolvedEnv)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	return C.CString(string(encoding))
+}
 
 // Exists checks if a secret exists at `path`.
 //export Exists

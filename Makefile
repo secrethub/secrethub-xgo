@@ -32,12 +32,15 @@ compile-win: $(DEPS)
 	x86_64-w64-mingw32-gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
 	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/Client.dll
 
+# Environment variables used in tests
+dotnet-test: TEST=secrethub://secrethub-xgo/dotnet/test-secret
+dotnet-test: OTHER_TEST=secrethub://secrethub-xgo/dotnet/other-test-secret
 .PHONY: dotnet-test
 dotnet-test: lib lib-win
 	cp $(addprefix $(DOTNET_DIR)/, $(TEST_FILES)) $(DOTNET_DIR)/test
 	dotnet publish $(DOTNET_DIR)/test/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
-	mv $(DOTNET_DIR)/libClient.so $(DOTNET_DIR)/build 
-	dotnet test $(DOTNET_DIR)/build/secrethub.dll --nologo
+	mv $(DOTNET_DIR)/libClient.so $(DOTNET_DIR)/build
+	TEST='$(TEST)' OTHER_TEST='$(OTHER_TEST)' dotnet test $(DOTNET_DIR)/build/secrethub.dll --nologo
 	make clean
 
 .PHONY: nupkg
