@@ -1,6 +1,7 @@
 SHELL = bash
 CGO_FILES = Client.a Client.h
 SWIG_FILES = Client.cs secrethub_wrap.c ClientPINVOKE.cs Secret.cs SecretVersion.cs
+TEST_FILES = Client.cs ClientPINVOKE.cs Secret.cs SecretVersion.cs
 OUT_FILES = secrethub_wrap.o libClient.so Client.dll
 DOTNET_DIR = ./dotnet
 DEPS = $(DOTNET_DIR)/secrethub_wrap.c $(DOTNET_DIR)/Client.h
@@ -31,6 +32,14 @@ compile-win: $(DEPS)
 	x86_64-w64-mingw32-gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
 	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/Client.dll
 
+.PHONY: dotnet-test
+dotnet-test: lib lib-win
+	cp $(addprefix $(DOTNET_DIR)/, $(TEST_FILES)) $(DOTNET_DIR)/test
+	dotnet publish $(DOTNET_DIR)/test/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
+	mv $(DOTNET_DIR)/libClient.so $(DOTNET_DIR)/build 
+	dotnet test $(DOTNET_DIR)/build/secrethub.dll --nologo
+	make clean
+
 .PHONY: nupkg
 nupkg: lib lib-win
 	dotnet pack $(DOTNET_DIR)/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
@@ -49,5 +58,5 @@ deps:
 .PHONY: clean
 clean:
 	rm -f go.sum
-	rm -f $(addprefix $(DOTNET_DIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES))
-	rm -rf $(DOTNET_DIR)/build $(DOTNET_DIR)/bin $(DOTNET_DIR)/obj
+	rm -f $(addprefix $(DOTNET_DIR)/, $(CGO_FILES) $(SWIG_FILES) $(OUT_FILES)) $(addprefix $(DOTNET_DIR)/test/, $(TEST_FILES))
+	rm -rf $(addprefix $(DOTNET_DIR)/, build bin obj test/bin test/obj)
