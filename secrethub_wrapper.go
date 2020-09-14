@@ -25,7 +25,6 @@ struct SecretVersion {
 	char* Status;
 };
 #include <stdbool.h>
-#include <stdlib.h>
 */
 import "C"
 
@@ -33,7 +32,6 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
-	"unsafe"
 
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
@@ -133,8 +131,6 @@ func ResolveEnv(errMessage **C.char) *C.char {
 		value := C.CString(envVar[1])
 		resolvedValue := Resolve(value, errMessage)
 		resolvedEnv[key] = C.GoString(resolvedValue)
-		C.free(unsafe.Pointer(value))
-		C.free(unsafe.Pointer(resolvedValue))
 	}
 	encoding, err := json.Marshal(resolvedEnv)
 	if err != nil {
