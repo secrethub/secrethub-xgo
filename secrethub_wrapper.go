@@ -33,6 +33,7 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
+	"unsafe"
 
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
@@ -129,18 +130,18 @@ func ResolveEnv(errMessage **C.char) *C.char {
 	for _, value := range envVars {
 		envVar := strings.Split(value, "=")
 		key := envVar[0]
-		value := C.String(envVar[1])
+		value := C.CString(envVar[1])
 		resolvedValue := Resolve(value, errMessage)
 		resolvedEnv[key] = C.GoString(resolvedValue)
-		C.free(value)
-		C.free(resolvedValue)
+		C.free(unsafe.Pointer(value))
+		C.free(unsafe.Pointer(resolvedValue))
 	}
 	encoding, err := json.Marshal(resolvedEnv)
 	if err != nil {
 		*errMessage = C.CString(err.Error())
 		return nil
 	}
-	return C.CString(encoding)
+	return C.CString(string(encoding))
 }
 
 // Exists checks if a secret exists at `path`.
