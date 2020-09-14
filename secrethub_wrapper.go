@@ -25,6 +25,7 @@ struct SecretVersion {
 	char* Status;
 };
 #include <stdbool.h>
+#include <stdlib.h>
 */
 import "C"
 
@@ -126,8 +127,13 @@ func ResolveEnv(errMessage **C.char) *C.char {
 	envVars := os.Environ()
 	resolvedEnv := make(map[string]string, len(envVars))
 	for _, value := range envVars {
-		keyValue := strings.Split(value, "=")
-		resolvedEnv[keyValue[0]] = C.GoString(Resolve(keyValue[1], errMessage))
+		envVar := strings.Split(value, "=")
+		key := envVar[0]
+		value := C.String(envVar[1])
+		resolvedValue := Resolve(value, errMessage)
+		resolvedEnv[key] = C.GoString(resolvedValue)
+		C.free(value)
+		C.free(resolvedValue)
 	}
 	encoding, err := json.Marshal(resolvedEnv)
 	if err != nil {
