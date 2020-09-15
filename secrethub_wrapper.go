@@ -100,7 +100,7 @@ func ReadString(path *C.char, errMessage **C.char) *C.char {
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
 func Resolve(ref *C.char, errMessage **C.char) *C.char {
-	lowercaseRef = strings.toLower(C.GoString(ref))
+	lowercaseRef := strings.ToLower(C.GoString(ref))
 	prefix := "secrethub://"
 	if strings.HasPrefix(lowercaseRef, prefix) {
 		client, err := Client()
@@ -108,7 +108,7 @@ func Resolve(ref *C.char, errMessage **C.char) *C.char {
 			*errMessage = C.CString(err.Error())
 			return nil
 		}
-		secret, err = client.Secrets().Read(strings.TrimPrefix(lowercaseRef, prefix))
+		secret, err := client.Secrets().Read(strings.TrimPrefix(lowercaseRef, prefix))
 		if err != nil {
 			*errMessage = C.CString(err.Error())
 			return nil
