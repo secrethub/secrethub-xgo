@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "xp/cjMXnoaSVZKMTqjk0tqTFZYNZZZogGoZzszIn6ObSs+h9iFZxgoenQWZ52p5DoqWi1fL8WGASYytdGeAVbA==",
+  "success": true,
+  "projectFilePath": "/home/teddy/Documents/secrethub-xgo/azure-example/azure-example.csproj",
+  "expectedPackageFiles": [
+    "/home/teddy/.nuget/packages/secrethub/1.0.0/secrethub.1.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
