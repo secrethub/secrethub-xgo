@@ -52,10 +52,10 @@ deps:
 	sudo apt install libpcre3-dev
 	# install swig
 	wget https://downloads.sourceforge.net/swig/swig-$(SWIG_VERSION).tar.gz
-	mkdir -p swig && tar -xzvf swig-$(SWIG_VERSION).tar.gz -C swig --strip-components 1
-	cd swig
+	mkdir -p tmp && tar -xzvf swig-$(SWIG_VERSION).tar.gz -C tmp --strip-components 1
+	cd tmp
 	./configure; sudo make; sudo make install
-	cd ..; rm -rf swig; rm -f swig-$(SWIG_VERSION).tar.gz
+	cd ..; rm -rf tmp; rm -f swig-$(SWIG_VERSION).tar.gz
 	echo "export SWIG_PATH=usr/local/share/swig/bin" | sudo tee -a /etc/profile
 	echo "export PATH=$(SWIG_PATH):$(PATH)" | sudo tee -a /etc/profile
 	source /etc/profile
