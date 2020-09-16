@@ -47,7 +47,7 @@ func Client() (*secrethub.Client, error) {
 	return secrethub.NewClient(options...)
 }
 
-// Read retrieves a secret by its path.
+// Read gets a secret version, with sensitive data decrypted.
 //export Read
 func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 	client, err := Client()
@@ -80,7 +80,7 @@ func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 	}
 }
 
-// ReadString retrieves a secret as a string.
+// ReadString gets the secret data as a string.
 //export ReadString
 func ReadString(path *C.char, errMessage **C.char) *C.char {
 	client, err := Client()
@@ -143,7 +143,7 @@ func ResolveEnv(errMessage **C.char) *C.char {
 	return C.CString(string(encoding))
 }
 
-// Exists checks if a secret exists at `path`.
+// Exists returns whether a secret exists on the given `path`.
 //export Exists
 func Exists(path *C.char, errMessage **C.char) C.bool {
 	client, err := Client()
