@@ -13,6 +13,7 @@ In order to make use of the package, you will need to have the following install
 First, you have to make the NuGet Package and use it in your project. To do so, Here are the steps:
 1. execute `make nupkg` from the Makefile
 2. Go to your .NET project and run the following command: `dotnet add package SecretHub -s <path_to_your_secrethub-xgo_repo>`.
+3. Since our library uses Json.Net, you also need to add this dependency to your project. To do so, run the following command: `dotnet add package Newtonsoft.Json`.
 
 ## How to call library functions
 
