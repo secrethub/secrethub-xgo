@@ -1,7 +1,7 @@
 SHELL = bash
 SWIG_VERSION = 4.0.2
 CGO_FILES = Client.a Client.h
-SWIG_FILES = Client.cs secrethub_wrap.c ClientPINVOKE.cs Secret.cs SecretVersion.cs
+SWIG_FILES = MyClient.cs secrethub_wrap.c ClientPINVOKE.cs Secret.cs SecretVersion.cs
 TEST_FILES = Client.cs ClientPINVOKE.cs Secret.cs SecretVersion.cs
 OUT_FILES = secrethub_wrap.o libClient.so Client.dll
 DOTNET_DIR = ./dotnet

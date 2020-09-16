@@ -24,29 +24,54 @@ struct SecretVersion {
 	time CreatedAt;
 	char* Status;
 };
+
+struct MyClient {
+	int ID;
+};
 #include <stdbool.h>
+#include <stdlib.h>
 */
 import "C"
 
 import (
-	"encoding/json"
-	"os"
-	"strings"
-
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
+	"unsafe"
 )
 
-// Client creates and returns a new Go client to be used by xgo clients.
-func Client() (*secrethub.Client, error) {
+var clients = make(map[int]secrethub.ClientInterface)
+var nextClientID = 1;
+
+//export new_MyClient
+func new_MyClient(errMessage **C.char) *C.struct_MyClient{
 	options := []secrethub.ClientOption{
 		secrethub.WithAppInfo(&secrethub.AppInfo{
 			Name:    "secrethub-xgo",
 			Version: "0.1.0",
 		}),
 	}
-	return secrethub.NewClient(options...)
+	client, err := secrethub.NewClient(options...)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	cClient := (*C.struct_MyClient)(C.malloc(C.size_t(unsafe.Sizeof(C.struct_MyClient{}))))
+	cClient.ID = C.int(nextClientID)
+	clients[nextClientID] = client
+	nextClientID++
+	return cClient
 }
 
+//export delete_MyClient
+func delete_MyClient(cClient *C.struct_MyClient) {
+	delete(clients, int(cClient.ID))
+	C.free(unsafe.Pointer(cClient))
+}
+
+func GetGoClient(cClient *C.struct_MyClient) secrethub.ClientInterface {
+	return clients[int(cClient.ID)]
+}
+
+/*
 // Read retrieves a secret by its path.
 //export Read
 func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
@@ -79,15 +104,11 @@ func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 		Status:    C.CString(secret.Status),
 	}
 }
-
+*/
 // ReadString retrieves a secret as a string.
-//export ReadString
-func ReadString(path *C.char, errMessage **C.char) *C.char {
-	client, err := Client()
-	if err != nil {
-		*errMessage = C.CString(err.Error())
-		return nil
-	}
+//export MyClient_ReadString
+func MyClient_ReadString(cClient *C.struct_MyClient, path *C.char, errMessage **C.char) *C.char {
+	client := GetGoClient(cClient)
 	secret, err := client.Secrets().Read(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
@@ -95,7 +116,7 @@ func ReadString(path *C.char, errMessage **C.char) *C.char {
 	}
 	return C.CString(string(secret.Data))
 }
-
+/*
 // Resolve fetches the values of a secret from SecretHub, when the `ref` parameter
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
@@ -188,5 +209,5 @@ func Write(path *C.char, secret *C.char, errMessage **C.char) {
 		return
 	}
 }
-
+*/
 func main() {}

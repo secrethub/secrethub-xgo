@@ -52,13 +52,23 @@
 }
 
 
-extern struct SecretVersion Read(char* path, char** errMessage);
-extern char* ReadString(char* path, char** errMessage);
-extern char* Resolve(char* path, char** errMessage);
+// extern struct SecretVersion Read(char* path, char** errMessage);
+//extern char* ReadString(char* path, char** errMessage);
+/*extern char* Resolve(char* path, char** errMessage);
 extern char* ResolveEnv(char** errMessage);
 extern bool Exists(char* path, char** errMessage);
 extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
+*/
+
+extern struct MyClient {
+    int ID;
+    %extend {
+        MyClient(char **errMessage);
+        ~MyClient();
+        char* ReadString(char* path, char** errMessage);
+    }
+};
 
 extern struct Secret {
 	uuid SecretID;
