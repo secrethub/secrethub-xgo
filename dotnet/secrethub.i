@@ -1,4 +1,4 @@
-%module Client
+%module SecretHubXGO
 %{
 #include "Client.h"
 %}
@@ -61,11 +61,11 @@ extern void Remove(char* path, char** errMessage);
 extern void Write(char* path, char* secret, char** errMessage);
 */
 
-extern struct MyClient {
+extern struct Client {
     int ID;
     %extend {
-        MyClient(char **errMessage);
-        ~MyClient();
+        Client(char **errMessage);
+        ~Client();
         char* ReadString(char* path, char** errMessage);
     }
 };

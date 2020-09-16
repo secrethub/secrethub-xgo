@@ -25,7 +25,7 @@ struct SecretVersion {
 	char* Status;
 };
 
-struct MyClient {
+struct Client {
 	int ID;
 };
 #include <stdbool.h>
@@ -41,8 +41,8 @@ import (
 var clients = make(map[int]secrethub.ClientInterface)
 var nextClientID = 1;
 
-//export new_MyClient
-func new_MyClient(errMessage **C.char) *C.struct_MyClient{
+//export new_Client
+func new_Client(errMessage **C.char) *C.struct_Client{
 	options := []secrethub.ClientOption{
 		secrethub.WithAppInfo(&secrethub.AppInfo{
 			Name:    "secrethub-xgo",
@@ -54,20 +54,20 @@ func new_MyClient(errMessage **C.char) *C.struct_MyClient{
 		*errMessage = C.CString(err.Error())
 		return nil
 	}
-	cClient := (*C.struct_MyClient)(C.malloc(C.size_t(unsafe.Sizeof(C.struct_MyClient{}))))
+	cClient := (*C.struct_Client)(C.malloc(C.size_t(unsafe.Sizeof(C.struct_Client{}))))
 	cClient.ID = C.int(nextClientID)
 	clients[nextClientID] = client
 	nextClientID++
 	return cClient
 }
 
-//export delete_MyClient
-func delete_MyClient(cClient *C.struct_MyClient) {
+//export delete_Client
+func delete_Client(cClient *C.struct_Client) {
 	delete(clients, int(cClient.ID))
 	C.free(unsafe.Pointer(cClient))
 }
 
-func GetGoClient(cClient *C.struct_MyClient) secrethub.ClientInterface {
+func GetGoClient(cClient *C.struct_Client) secrethub.ClientInterface {
 	return clients[int(cClient.ID)]
 }
 
@@ -106,8 +106,8 @@ func Read(path *C.char, errMessage **C.char) C.struct_SecretVersion {
 }
 */
 // ReadString retrieves a secret as a string.
-//export MyClient_ReadString
-func MyClient_ReadString(cClient *C.struct_MyClient, path *C.char, errMessage **C.char) *C.char {
+//export Client_ReadString
+func Client_ReadString(cClient *C.struct_Client, path *C.char, errMessage **C.char) *C.char {
 	client := GetGoClient(cClient)
 	secret, err := client.Secrets().Read(C.GoString(path))
 	if err != nil {
