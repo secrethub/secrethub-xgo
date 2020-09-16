@@ -116,6 +116,22 @@ namespace azure_example
                         return;
                     }
 
+                    try {
+                        // Here we will get the list of environment variables and their values. If one's value is a 
+                        // reference of the format `secrethub://<path>`, this function will replace it with the secret value,
+                        // the one you will use in your code.
+                        Dictionary<string, string> envVars = SecretHub.Client.ResolveEnv();
+                        string response = "";
+                        foreach(KeyValuePair<string, string> kvp in envVars)
+                            response += string.Format("Key: {0}, Value: {1}\n", kvp.Key, kvp.Value);
+                        await context.Response.WriteAsync(response);
+                    } catch(Exception ex) {
+                        Console.WriteLine(ex.ToString());
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("Error encountered while resolving environment variables.");
+                        return;
+                    }
+
                     await context.Response.WriteAsync(outputSuccess);
                 });
             });

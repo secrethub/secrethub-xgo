@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "xp/cjMXnoaSVZKMTqjk0tqTFZYNZZZogGoZzszIn6ObSs+h9iFZxgoenQWZ52p5DoqWi1fL8WGASYytdGeAVbA==",
+  "dgSpecHash": "hqwuVZ3b9LEAI/Glif/9ZWJSEoEjrEHgKgMe2LshfC4C4loGOgb3KzBa1CQNBfbGj/BGtOBS3sW1MzYnmBIBOw==",
   "success": true,
   "projectFilePath": "/home/teddy/Documents/secrethub-xgo/azure-example/azure-example.csproj",
   "expectedPackageFiles": [
+    "/home/teddy/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512",
     "/home/teddy/.nuget/packages/secrethub/1.0.0/secrethub.1.0.0.nupkg.sha512"
   ],
   "logs": []
