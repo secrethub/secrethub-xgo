@@ -29,6 +29,8 @@ struct SecretVersion {
 import "C"
 
 import (
+	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
@@ -42,8 +44,7 @@ func Client() (*secrethub.Client, error) {
 			Version: "0.1.0",
 		}),
 	}
-	client, err := secrethub.NewClient(options...)
-	return client, err
+	return secrethub.NewClient(options...)
 }
 
 // Read retrieves a secret by its path.
@@ -99,14 +100,15 @@ func ReadString(path *C.char, errMessage **C.char) *C.char {
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Resolve
 func Resolve(ref *C.char, errMessage **C.char) *C.char {
-	client, err := Client()
-	if err != nil {
-		*errMessage = C.CString(err.Error())
-		return nil
-	}
-	bits := strings.Split(C.GoString(ref), "://")
-	if len(bits) == 2 && bits[0] == "secrethub" {
-		secret, err := client.Secrets().Read(bits[1])
+	lowercaseRef := strings.ToLower(C.GoString(ref))
+	prefix := "secrethub://"
+	if strings.HasPrefix(lowercaseRef, prefix) {
+		client, err := Client()
+		if err != nil {
+			*errMessage = C.CString(err.Error())
+			return nil
+		}
+		secret, err := client.Secrets().Read(strings.TrimPrefix(lowercaseRef, prefix))
 		if err != nil {
 			*errMessage = C.CString(err.Error())
 			return nil
@@ -116,18 +118,30 @@ func Resolve(ref *C.char, errMessage **C.char) *C.char {
 	return ref
 }
 
-/*
 // ResolveEnv takes a map of environment variables and replaces the values of those
 // which store references of secrets in SecretHub (`secrethub://<path>`) with the value
 // of the respective secret. The other entries in the map remain untouched.
 //export ResolveEnv
-func ResolveEnv(envVars map[string]string) map[string]string {
+func ResolveEnv(errMessage **C.char) *C.char {
+	envVars := os.Environ()
 	resolvedEnv := make(map[string]string, len(envVars))
-	for key, value := range envVars {
-		resolvedEnv[key] = string(Resolve(value))
+	for _, value := range envVars {
+		envVar := strings.SplitN(value, "=", 2)
+		if len(envVar) < 2 {
+			continue
+		}
+		key := envVar[0]
+		value := C.CString(envVar[1])
+		resolvedValue := Resolve(value, errMessage)
+		resolvedEnv[key] = C.GoString(resolvedValue)
 	}
-	return resolvedEnv
-}*/
+	encoding, err := json.Marshal(resolvedEnv)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	return C.CString(string(encoding))
+}
 
 // Exists checks if a secret exists at `path`.
 //export Exists
@@ -156,6 +170,7 @@ func Remove(path *C.char, errMessage **C.char) {
 	err = client.Secrets().Delete(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
+		return
 	}
 }
 
@@ -170,6 +185,7 @@ func Write(path *C.char, secret *C.char, errMessage **C.char) {
 	_, err = client.Secrets().Write(C.GoString(path), []byte(C.GoString(secret)))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
+		return
 	}
 }
 
