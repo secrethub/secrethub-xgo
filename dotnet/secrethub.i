@@ -52,7 +52,6 @@
 }
 
 extern struct Client {
-    int ID;
     %extend {
         Client(char **errMessage);
         ~Client();
