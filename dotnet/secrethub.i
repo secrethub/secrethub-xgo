@@ -51,22 +51,18 @@
     return res;
 }
 
-
-// extern struct SecretVersion Read(char* path, char** errMessage);
-//extern char* ReadString(char* path, char** errMessage);
-/*extern char* Resolve(char* path, char** errMessage);
-extern char* ResolveEnv(char** errMessage);
-extern bool Exists(char* path, char** errMessage);
-extern void Remove(char* path, char** errMessage);
-extern void Write(char* path, char* secret, char** errMessage);
-*/
-
 extern struct Client {
     int ID;
     %extend {
         Client(char **errMessage);
         ~Client();
+        struct SecretVersion Read(char* path, char** errMessage);
         char* ReadString(char* path, char** errMessage);
+        char* Resolve(char* path, char** errMessage);
+        char* ResolveEnv(char** errMessage);
+        bool Exists(char* path, char** errMessage);
+        void Remove(char* path, char** errMessage);
+        void Write(char* path, char* secret, char** errMessage);
     }
 };
 
