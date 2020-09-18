@@ -38,10 +38,12 @@ import (
 	"github.com/secrethub/secrethub-go/pkg/secrethub"
 	"os"
 	"strings"
+	"sync"
 	"unsafe"
 )
 
 var clients = make(map[int]secrethub.ClientInterface)
+var clientsMutex sync.Mutex
 var nextClientID = 1;
 
 // new_Client creates a new Go client, stores it in the client map and
@@ -62,9 +64,11 @@ func new_Client(errMessage **C.char) *C.struct_Client{
 		return nil
 	}
 	cClient := (*C.struct_Client)(C.malloc(C.size_t(unsafe.Sizeof(C.struct_Client{}))))
+	clientsMutex.Lock()
 	cClient.ID = C.int(nextClientID)
 	clients[nextClientID] = client
 	nextClientID++
+	clientsMutex.Unlock()
 	return cClient
 }
 
