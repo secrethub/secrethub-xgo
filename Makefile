@@ -7,25 +7,26 @@ OUT_FILES = secrethub_wrap.o libClient.so Client.dll
 DOTNET_DIR = ./dotnet
 DEPS = $(DOTNET_DIR)/secrethub_wrap.c $(DOTNET_DIR)/Client.h
 OBJ = $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/Client.a
+OS_VAR = $(shell uname -s | tr A-Z a-z)
 
 lib: client swig compile
 	@echo "Library Ready ^-^"
 
-ifeq ($(OS),Windows_NT)
+ifeq ($(OS_VAR), Windows_NT)
 .PHONY: client
 client: secrethub_wrapper.go
-	@echo "Making the C library from Go files..."
+	@echo "Making the C library from Go files (Windows)..."
 	@GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -o $(DOTNET_DIR)/Client.a -buildmode=c-archive secrethub_wrapper.go
 
 .PHONY: compile
 compile: $(DEPS)
-	@echo "Compiling using gcc..."
+	@echo "Compiling..."
 	@x86_64-w64-mingw32-gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
 	@x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/Client.dll
 else
 .PHONY: client
 client: secrethub_wrapper.go
-	@echo "Making the C library from Go files..."
+	@echo "Making the C library from Go files (Linux)..."
 	@go build -o $(DOTNET_DIR)/Client.a -buildmode=c-archive secrethub_wrapper.go
 
 .PHONY: compile
@@ -34,6 +35,10 @@ compile: $(DEPS)
 	@gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
 	@gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/libClient.so
 endif
+
+lib-all:
+	@make OS_VAR=Linux lib --no-print-directory
+	@make OS_VAR=Windows_NT lib --no-print-directory
 
 .PHONY: swig
 swig:
@@ -44,19 +49,24 @@ swig:
 dotnet-test: TEST=secrethub://secrethub-xgo/dotnet/test-secret
 dotnet-test: OTHER_TEST=secrethub://secrethub-xgo/dotnet/other-test-secret
 .PHONY: dotnet-test
-dotnet-test: lib lib-win
-	cp $(addprefix $(DOTNET_DIR)/, $(TEST_FILES)) $(DOTNET_DIR)/test
-	dotnet publish $(DOTNET_DIR)/test/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
-	mv $(DOTNET_DIR)/libClient.so $(DOTNET_DIR)/build
-	TEST='$(TEST)' OTHER_TEST='$(OTHER_TEST)' dotnet test $(DOTNET_DIR)/build/secrethub.dll --nologo
-	make clean
+dotnet-test: lib
+	@echo "Testing the library..."
+	@cp $(addprefix $(DOTNET_DIR)/, $(TEST_FILES)) $(DOTNET_DIR)/test
+	@dotnet publish $(DOTNET_DIR)/test/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
+ifeq (OS_VAR, Windows_NT)
+	@mv $(DOTNET_DIR)/Client.dll $(DOTNET_DIR)/build
+else
+	@mv $(DOTNET_DIR)/libClient.so $(DOTNET_DIR)/build
+endif
+	@TEST='$(TEST)' OTHER_TEST='$(OTHER_TEST)' dotnet test $(DOTNET_DIR)/build/secrethub.dll --nologo
+	@make clean --no-print-directory
 
 .PHONY: nupkg
-nupkg: lib
+nupkg: lib-all
 	@echo "Making the NuGet Package..."
 	@dotnet pack $(DOTNET_DIR)/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
 	@mv $(DOTNET_DIR)/build/SecretHub.*.nupkg .
-	@make clean
+	@make clean --no-print-directory
 	@echo "NuGet Package Ready ^-^"
 
 #.PHONY: nupkg-publish
@@ -65,12 +75,12 @@ nupkg: lib
 
 .PHONY: deps
 deps:
-# install gcc
+# 	install gcc
 	@sudo apt install -qy gcc
 	@sudo apt install -qy gcc-mingw-w64
-# install pcre
+# 	install pcre
 	@sudo apt install -qy libpcre3-dev
-# install swig
+# 	install swig
 	@wget https://downloads.sourceforge.net/swig/swig-$(SWIG_VERSION).tar.gz
 	@mkdir -p tmp && tar -xzvf swig-$(SWIG_VERSION).tar.gz -C tmp --strip-components 1
 	@cd tmp && ./configure&& sudo make && sudo make install
