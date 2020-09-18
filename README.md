@@ -1,46 +1,61 @@
 # SecretHub Cross Language Golang Client<sup>**experimental**</sup>
 
-`secrethub-xgo` wraps the `secrethub-go` client with `cgo` exported functions so it can be called from other languages, e.g. C, C#, Python, Ruby, NodeJS, and Java. 
+`secrethub-xgo` wraps the `secrethub-go` client with `cgo` exported functions so it can be called from other languages, e.g. C, Python, Ruby, NodeJS, and Java. 
 
-At the moment, we provide the library for C# usage. 
+For a proof of concept of how a client writting in another language can use `secrethub-xgo`, see the `clients/` folder. Right now it only contains a Java example, but more will be added in the future.
 
-In order to make use of the package, you will need to have the following installed:
- - [.NET Core](https://docs.microsoft.com/en-gb/dotnet/core/install/)
- - [Golang](https://golang.org/doc/install)
+Make sure you build the `secrethub-xgo` client first before using the example client code. 
 
-## Create and use the package
+To build the `secrethub-xgo` c-shared object, run the `build.sh` script. It will place the build in a `linux` or `darwin` folder, depending on your OS. 
 
-First, you have to make the NuGet Package and use it in your project. To do so, Here are the steps:
-1. execute `make nupkg` from the Makefile
-2. Go to your .NET project and run the following command: `dotnet add package SecretHub -s <path_to_your_secrethub-xgo_repo>`.
-3. Since our library uses Json.Net, you also need to add this dependency to your project. To do so, run the following command: `dotnet add package Newtonsoft.Json`.
+You'll need to have [Golang](https://golang.org/doc/install) installed. 
 
-## How to call library functions
 
-- Read
-`SecretHub.SecretVersion secret = SecretHub.Client.Read("path_to_secret");`
+### Windows Support
 
-- ReadString
-`string secret = SecretHub.Client.ReadString("path_to_secret");`
+Because we need `cgo` enabled for the compilation, Golang cannot cross compile for different operating systems as you might be used to. That's why I've only implemented it for Linux and macOS for now. 
 
-- Exists
-`bool isSecret = SecretHub.Client.Exists("path_to_secret");`
+Building for windows is *theoretically* possible by appliying the same concepts as written in the `build.sh` script. Difference would be to name the output `.dll` and to make the name of the output folder match your OS name. 
 
-- Write
-`SecretHub.Client.Write("path_to_secret", "secret_value");`
+I haven't tried it yet though. 
 
-- Remove
-`SecretHub.Client.Remove("path_to_secret");`
+In the future, we may want to check out [github.com/karalabe/xgo](https://github.com/karalabe/xgo) and see if we can use it to compile for all operating systems. 
 
-- Resolve
-`string secret = SecretHub.Client.Resolve("reference");`
+## Experimental status
 
-- ResolveEnv
-`Doctionary<string, string> resolvedEnv = SecretHub.Client.ResolveEnv(dictionaryToResolve);`
+Note that this project is still very early stage and should **NOT** be considered anywhere near stable enough to use in production. 
 
-## Example
+- [X] Serialize data through one single type (e.g. `GoString`)
+- [X] Implement a single contract for multiple languages with generated boilerplate.
+- [ ] Review data serialization & abstract encoding away to avoid boilerplate.
+- [ ] Improve/implement error handling
+- [ ] Ensure we free memory correctly. See https://golang.org/cmd/cgo/#hdr-Go_references_to_C
+- [ ] Organize repo structure, naming, and separate repos vs. monorepo.
+- [ ] Dockerize build process
+- [ ] Build for Linux, macOS & Windows
+- [ ] Package for language native platforms, including the `.so` files etc.
+- [ ] Make a beautiful README.md
+- [ ] Implement Java Client:
+    - [X] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
+- [ ] Implement Python Client:
+    - [X] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
+- [ ] Implement Ruby Client:
+    - [ ] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
+- [ ] Implement JavaScript/Node Client:
+    - [ ] `Read`
+    - [ ] `Write`
+    - [ ] `Remove`
+    - [ ] `Exists`
 
-An example project is found in `azure-example`. There you can see the library in action.
 
 ## Resources
 
