@@ -44,6 +44,10 @@ import (
 var clients = make(map[int]secrethub.ClientInterface)
 var nextClientID = 1;
 
+// new_Client creates a new Go client, stores it in the client map and
+// returns a (C) client struct with the id of the Go client.
+//
+// This method is called by the Client constructor in the target language.
 //export new_Client
 func new_Client(errMessage **C.char) *C.struct_Client{
 	options := []secrethub.ClientOption{
@@ -64,21 +68,27 @@ func new_Client(errMessage **C.char) *C.struct_Client{
 	return cClient
 }
 
+// delete_Client frees the memory occupied by the given client object and
+// clears its corresponding entry in the map.
+//
+// This method is called by the client destructor (or) on garbage collection
+// of the client object in the target language.
 //export delete_Client
 func delete_Client(cClient *C.struct_Client) {
 	delete(clients, int(cClient.ID))
 	C.free(unsafe.Pointer(cClient))
 }
 
-func GetGoClient(cClient *C.struct_Client) secrethub.ClientInterface {
+// GoClient returns the underlying Go client corresponding to the
+// given C client.
+func GoClient(cClient *C.struct_Client) secrethub.ClientInterface {
 	return clients[int(cClient.ID)]
 }
-
 
 // Client_Read retrieves a secret by its path.
 //export Client_Read
 func Client_Read(cClient *C.struct_Client, path *C.char, errMessage **C.char) C.struct_SecretVersion {
-	client := GetGoClient(cClient)
+	client := GoClient(cClient)
 	secret, err := client.Secrets().Read(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
@@ -107,7 +117,7 @@ func Client_Read(cClient *C.struct_Client, path *C.char, errMessage **C.char) C.
 // Client_ReadString retrieves a secret as a string.
 //export Client_ReadString
 func Client_ReadString(cClient *C.struct_Client, path *C.char, errMessage **C.char) *C.char {
-	client := GetGoClient(cClient)
+	client := GoClient(cClient)
 	secret, err := client.Secrets().Read(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
@@ -123,7 +133,7 @@ func Client_Resolve(cClient *C.struct_Client, ref *C.char, errMessage **C.char) 
 	lowercaseRef := strings.ToLower(C.GoString(ref))
 	prefix := "secrethub://"
 	if strings.HasPrefix(lowercaseRef, prefix) {
-		client := GetGoClient(cClient)
+		client := GoClient(cClient)
 		secret, err := client.Secrets().Read(strings.TrimPrefix(lowercaseRef, prefix))
 		if err != nil {
 			*errMessage = C.CString(err.Error())
@@ -162,7 +172,7 @@ func Client_ResolveEnv(cClient *C.struct_Client, errMessage **C.char) *C.char {
 // Client_Exists checks if a secret exists at `path`.
 //export Client_Exists
 func Client_Exists(cClient *C.struct_Client, path *C.char, errMessage **C.char) C.bool {
-	client := GetGoClient(cClient)
+	client := GoClient(cClient)
 	exists, err := client.Secrets().Exists(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
@@ -174,7 +184,7 @@ func Client_Exists(cClient *C.struct_Client, path *C.char, errMessage **C.char) 
 // Client_Remove deletes the secret found at `path`, if it exists.
 //export Client_Remove
 func Client_Remove(cClient *C.struct_Client, path *C.char, errMessage **C.char) {
-	client := GetGoClient(cClient)
+	client := GoClient(cClient)
 	err := client.Secrets().Delete(C.GoString(path))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
@@ -185,7 +195,7 @@ func Client_Remove(cClient *C.struct_Client, path *C.char, errMessage **C.char) 
 // Client_Write writes a secret containing the contents of `secret` at `path`.
 //export Client_Write
 func Client_Write(cClient *C.struct_Client, path *C.char, secret *C.char, errMessage **C.char) {
-	client := GetGoClient(cClient)
+	client := GoClient(cClient)
 	_, err := client.Secrets().Write(C.GoString(path), []byte(C.GoString(secret)))
 	if err != nil {
 		*errMessage = C.CString(err.Error())
