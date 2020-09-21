@@ -3,13 +3,14 @@ SWIG_VERSION = 4.0.2
 CGO_FILES = Client.a Client.h
 SWIG_FILES = Client.cs secrethub_wrap.c SecretHubXGOPINVOKE.cs Secret.cs SecretVersion.cs
 TEST_FILES = Client.cs SecretHubXGOPINVOKE.cs Secret.cs SecretVersion.cs
-OUT_FILES = secrethub_wrap.o libSecretHubXGO.so SecretHubXGO.dll
+OUT_FILES = secrethub_wrap.o linux-64/libSecretHubXGO.so win-32/SecretHubXGO.dll win-64/SecretHubXGO.dll
 DOTNET_DIR = ./dotnet
 DEPS = $(DOTNET_DIR)/secrethub_wrap.c $(DOTNET_DIR)/Client.h
 OBJ = $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/Client.a
 
 lib: client swig compile
 lib-win: client-win swig compile-win
+lib-win-32: client-win-32 swig compile-win-32
 
 .PHONY: client
 client: secrethub_wrapper.go
@@ -18,6 +19,10 @@ client: secrethub_wrapper.go
 .PHONY: client-win
 client-win: secrethub_wrapper.go
 	GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -o $(DOTNET_DIR)/Client.a -buildmode=c-archive secrethub_wrapper.go
+
+.PHONY: client-win-32
+client-win-32: secrethub_wrapper.go
+	GOOS=windows GOARCH=386 CGO_ENABLED=1 CC="i686-w64-mingw32-gcc -Wl,--kill-at" go build -o $(DOTNET_DIR)/Client.a -buildmode=c-archive secrethub_wrapper.go
 
 .PHONY: swig
 swig:
@@ -28,12 +33,17 @@ swig:
 .PHONY: compile
 compile: $(DEPS)
 	gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
-	gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/libSecretHubXGO.so
+	gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/linux-64/libSecretHubXGO.so
 
 .PHONY: compile-win
 compile-win: $(DEPS)
 	x86_64-w64-mingw32-gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
-	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/SecretHubXGO.dll
+	x86_64-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/win-64/SecretHubXGO.dll
+
+.PHONY: compile-win-32
+compile-win-32: $(DEPS)
+	i686-w64-mingw32-gcc -c -O2 -fpic -o $(DOTNET_DIR)/secrethub_wrap.o $(DOTNET_DIR)/secrethub_wrap.c
+	i686-w64-mingw32-gcc -shared -fPIC $(OBJ) -o $(DOTNET_DIR)/win-32/SecretHubXGO.dll
 
 # Environment variables used in tests
 define TEST_ENV_VARS
@@ -45,12 +55,12 @@ endef
 dotnet-test: lib lib-win
 	cp $(addprefix $(DOTNET_DIR)/, $(TEST_FILES)) $(DOTNET_DIR)/test
 	dotnet publish $(DOTNET_DIR)/test/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
-	mv $(DOTNET_DIR)/libSecretHubXGO.so $(DOTNET_DIR)/build
+	mv $(DOTNET_DIR)/linux-64/libSecretHubXGO.so $(DOTNET_DIR)/build
 	$(TEST_ENV_VARS) dotnet test $(DOTNET_DIR)/build/secrethub.dll --nologo
 	make clean
 
 .PHONY: nupkg
-nupkg: lib lib-win
+nupkg: lib lib-win lib-win-32
 	dotnet pack $(DOTNET_DIR)/secrethub.csproj -o $(DOTNET_DIR)/build --nologo
 	mv $(DOTNET_DIR)/build/SecretHub.*.nupkg .
 	make clean
