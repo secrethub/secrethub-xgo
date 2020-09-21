@@ -1,6 +1,7 @@
 package main
 
 /*
+#include "stdint.h"
 typedef long long time;
 typedef char* uuid;
 
@@ -26,7 +27,7 @@ struct SecretVersion {
 };
 
 struct Client {
-	int ID;
+	uint64_t ID;
 };
 #include <stdbool.h>
 #include <stdlib.h>
@@ -45,7 +46,7 @@ import (
 
 var clients sync.Map
 var clientIDMutex sync.Mutex
-var nextClientID = 1;
+var nextClientID uint64 = 1
 
 // new_Client creates a new Go client, stores it in the client map and
 // returns a (C) client struct with the id of the Go client.
@@ -66,7 +67,7 @@ func new_Client(errMessage **C.char) *C.struct_Client{
 	}
 	cClient := (*C.struct_Client)(C.malloc(C.size_t(unsafe.Sizeof(C.struct_Client{}))))
 	clientIDMutex.Lock()
-	cClient.ID = C.int(nextClientID)
+	cClient.ID = C.uint64_t(nextClientID)
 	clients.Store(nextClientID, client)
 	nextClientID++
 	clientIDMutex.Unlock()
@@ -80,14 +81,14 @@ func new_Client(errMessage **C.char) *C.struct_Client{
 // of the client object in the target language.
 //export delete_Client
 func delete_Client(cClient *C.struct_Client) {
-	clients.Delete(int(cClient.ID))
+	clients.Delete(uint64(cClient.ID))
 	C.free(unsafe.Pointer(cClient))
 }
 
 // GoClient returns the underlying Go client corresponding to the
 // given C client.
 func GoClient(cClient *C.struct_Client) (secrethub.ClientInterface, error) {
-	client, ok := clients.Load(int(cClient.ID))
+	client, ok := clients.Load(uint64(cClient.ID))
 	if !ok {
 		return nil, errors.New("invalid client object")
 	}
