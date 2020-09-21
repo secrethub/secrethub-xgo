@@ -147,22 +147,26 @@ func Client_ReadString(cClient *C.struct_Client, path *C.char, errMessage **C.ch
 // has the format `secrethub://<path>`. Otherwise it returns `ref` unchanged, as an array of bytes.
 //export Client_Resolve
 func Client_Resolve(cClient *C.struct_Client, ref *C.char, errMessage **C.char) *C.char {
-	lowercaseRef := strings.ToLower(C.GoString(ref))
+	client, err := GoClient(cClient)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	result, err := resolve(client, C.GoString(ref))
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
+	return C.CString(result)
+}
+
+func resolve(client secrethub.ClientInterface, ref string) (string, error) {
+	lowercaseRef := strings.ToLower(ref)
 	prefix := "secrethub://"
 	if strings.HasPrefix(lowercaseRef, prefix) {
-		client, err := GoClient(cClient)
-		if err != nil {
-			*errMessage = C.CString(err.Error())
-			return nil
-		}
-		secret, err := client.Secrets().Read(strings.TrimPrefix(lowercaseRef, prefix))
-		if err != nil {
-			*errMessage = C.CString(err.Error())
-			return nil
-		}
-		return C.CString(string(secret.Data))
+		return client.Secrets().ReadString(strings.TrimPrefix(lowercaseRef, prefix))
 	}
-	return ref
+	return ref, nil
 }
 
 // Client_ResolveEnv takes a map of environment variables and replaces the values of those
@@ -172,15 +176,23 @@ func Client_Resolve(cClient *C.struct_Client, ref *C.char, errMessage **C.char) 
 func Client_ResolveEnv(cClient *C.struct_Client, errMessage **C.char) *C.char {
 	envVars := os.Environ()
 	resolvedEnv := make(map[string]string, len(envVars))
+	client, err := GoClient(cClient)
+	if err != nil {
+		*errMessage = C.CString(err.Error())
+		return nil
+	}
 	for _, value := range envVars {
 		envVar := strings.SplitN(value, "=", 2)
 		if len(envVar) < 2 {
 			continue
 		}
 		key := envVar[0]
-		value := C.CString(envVar[1])
-		resolvedValue := Client_Resolve(cClient, value, errMessage)
-		resolvedEnv[key] = C.GoString(resolvedValue)
+		resolvedValue, err := resolve(client, envVar[1])
+		if err != nil {
+			*errMessage = C.CString(err.Error())
+			return nil
+		}
+		resolvedEnv[key] = resolvedValue
 	}
 	encoding, err := json.Marshal(resolvedEnv)
 	if err != nil {
