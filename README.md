@@ -2,6 +2,14 @@
 
 SecretHub - XGO wraps the `secrethub-go` client with `cgo` exported functions so it can be called form other languages, e.g. C, C#, Python, Ruby, NodeJS, and Java. To generate the code that will then be wrapped in the library used by a certian programming language, we use `swig`.
 
+## Table of Contents
+ - [Prerequisites](#prerequisites)
+ - [Usage](#usage)
+ - [Building from source](#building-from-source)
+ - [How to call library functions](#how-to-call-library-functions)
+ - [Resources](#resources)
+ - [Getting help](#getting-help)
+
 ## Prerequisites
 
 To make use of the package, you will need to have the following installed:
