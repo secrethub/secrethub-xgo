@@ -1,12 +1,12 @@
-# SecretHub-XGO Cross Language Golang Client (C#)
+# SecretHub Client for .NET
 
 SecretHub - XGO wraps the `secrethub-go` client with `cgo` exported functions so it can be called form other languages, e.g. C, C#, Python, Ruby, NodeJS, and Java. To generate the code that will then be wrapped in the library used by a certian programming language, we use `swig`.
 
 ## Table of Contents
  - [Prerequisites](#prerequisites)
- - [Usage](#usage)
+ - [Installation](#installation)
  - [Building from source](#building-from-source)
- - [How to call library functions](#how-to-call-library-functions)
+ - [Usage](#usage)
  - [Resources](#resources)
  - [Getting help](#getting-help)
 
@@ -16,13 +16,13 @@ To make use of the package, you will need to have the following installed:
  - [.NET Core](https://docs.microsoft.com/en-gb/dotnet/core/install/)
  - [Golang](https://golang.org/doc/install)
 
-## Usage
+## Installation
 
 To install SecretHub package from NuGet Gallery, run the following command in your project's directory: 
 ```bash
-dotnet add package SecretHub
+dotnet add package SecretHub --version 0.1.0
 ```
-or you can go to the project's `.csproj` file and add the following line:
+or you can add the following line to your project's `csproj` file:
 ```xml
 <PackageReference Include="SecretHub" Version="0.1.0" />
 ```
@@ -31,13 +31,13 @@ or you can go to the project's `.csproj` file and add the following line:
 1. Execute `make nupkg` from the Makefile
 2. Go to your .NET project direcotry and run the following command: `dotnet add package SecretHub -s <path_to_your_secrethub-xgo_repo>`.
 
-## How to call library functions
-Before doing any calls to the library, you need to create you SecretHub client. This is done in the following way:
+## Usage
+Before doing any calls to the library, you need to create you SecretHub client:
 ```csharp
 var client = new SecretHub.Client();
 ```
 
-After you have your client, you can perform on of the following functions:
+After you have your client, you can call the following methods:
 
 ### `Read(string path)`
 Retrieve a secret, including all its metadata:
@@ -61,13 +61,13 @@ bool isSecret = client.Exists("path/to/secret");
 ```
 
 ### `Write(string path, string secret)`
-Write a secret containing the contents of `secret` at `path`:
+Write a secret to a given `path`:
 ```csharp
 client.Write("path/to/secret", "secret_value");
 ```
 
 ### `Remove(string path)`
-Delete the secret found at `path`, if it exists:
+Delete the secret found at `path`:
 ```csharp
 client.Remove("path/to/secret");
 if (!client.Exists("path/to/secret"))
@@ -84,7 +84,7 @@ Console.WriteLine("The secret value got from reference is " + resolvedRef);
 ```
 
 ### `ResolveEnv()`
-Load all of the process's environment variables in a dictionary and replace all values that are a reference to a secret (`secrethub://<path>`) to the value as stored in SecretHub. The other values in the dictionary remain untouched.
+Return a dictionary containing the OS environment with all secret references (`secrethub://<path>`) replaced by their corresponding secret values.
 
 For example, if the following two environment variables are set:
  - `MY_SECRET=secrethub://path/to/secret`
