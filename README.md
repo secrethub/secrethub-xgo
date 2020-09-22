@@ -40,7 +40,7 @@ var client = new SecretHub.Client();
 After you have your client, you can call the following methods:
 
 ### `Read(string path)`
-Retrieve a secret, including all its metadata:
+Retrieve a secret, including all its metadata.
 ```csharp
 SecretHub.SecretVersion secret = client.Read("path/to/secret");
 Console.WriteLine("The secret value is " + secret.Data);
@@ -48,26 +48,26 @@ Console.WriteLine("The secret value is " + secret.Data);
 `SecretHub.SecretVersion` object represents a version of a secret with sensitive data.
 
 ### `ReadString(string path)`
-Retrieve a secret as a string:
+Retrieve a secret as a string.
  ```csharp
  string secret = client.Read("path/to/secret");
  Console.WriteLine("The secret value is " + secret);
  ```
 
 ### `Exists(string path)`
-Check if a secret exists at `path`:
+Check if a secret exists at `path`.
 ```csharp
 bool isSecret = client.Exists("path/to/secret");
 ```
 
 ### `Write(string path, string secret)`
-Write a secret to a given `path`:
+Write a secret to a given `path`.
 ```csharp
 client.Write("path/to/secret", "secret_value");
 ```
 
 ### `Remove(string path)`
-Delete the secret found at `path`:
+Delete the secret found at `path`.
 ```csharp
 client.Remove("path/to/secret");
 if (!client.Exists("path/to/secret"))
@@ -77,7 +77,7 @@ if (!client.Exists("path/to/secret"))
 ```
 
 ### `Resolve(string ref)`
-Fetch the value of a secret from SecretHub, when the `ref` has the format `secrethub://<path>`, otherwise it returns `ref` unchanged:
+Fetch the value of a secret from SecretHub, when the `ref` has the format `secrethub://<path>`, otherwise it returns `ref` unchanged.
 ```csharp
 string resolvedRef = client.Resolve("secrethub://path/to/secret");
 Console.WriteLine("The secret value got from reference is " + resolvedRef);
@@ -95,7 +95,7 @@ Then the following call to `ResolveEnv()`
 Dictionary<string, string> resolvedEnv = client.ResolveEnv();
 ```
 
-Would lead to the `resolvedEnv` containing the following contents:
+would lead to the `resolvedEnv` containing the following contents:
 ```csharp
 Doctionary<string, string>
 {
