@@ -1,22 +1,16 @@
-# SecretHub-XGO Guide for C# integration
+# SecretHub-XGO Cross Language Golang Client (C#)
 
-This is a guide containing the following:
- - [Prerequisites](#prerequisites)
- - [Usage](#usage)
- - [Building from source](#building-from-source)
- - [How to call library functions](#how-to-call-library-functions)
- - [Resources](#resources)
- - [Getting help](#getting-help)
+SecretHub - XGO wraps the `secrethub-go` client with `cgo` exported functions so it can be called form other languages, e.g. C, C#, Python, Ruby, NodeJS, and Java. To generate the code that will then be wrapped in the library used by a certian programming language, we use `swig`.
 
 ## Prerequisites
 
-In order to make use of the package, you will need to have the following installed:
+To make use of the package, you will need to have the following installed:
  - [.NET Core](https://docs.microsoft.com/en-gb/dotnet/core/install/)
  - [Golang](https://golang.org/doc/install)
 
 ## Usage
 
-To install SecretHub package from NuGet Gallery, run the following command in your project's direcotry: 
+To install SecretHub package from NuGet Gallery, run the following command in your project's directory: 
 ```bash
 dotnet add package SecretHub
 ```
@@ -33,10 +27,6 @@ or you can go to the project's `.csproj` file and add the following line:
 Before doing any calls to the library, you need to create you SecretHub client. This is done in the following way:
 ```csharp
 var client = new SecretHub.Client();
-``` 
-or 
-```csharp
-SecretHub.Client client = new SecretHub.Client();
 ```
 
 After you have your client, you can perform on of the following functions:
@@ -60,14 +50,6 @@ Retrieve a secret as a string:
 Check if a secret exists at `path`:
 ```csharp
 bool isSecret = client.Exists("path/to/secret");
-if (isSecret) 
-{
-    Console.WriteLine("The secret exists.");
-} 
-else 
-{
-    Console.WriteLine("The secret does not exists.");
-}
 ```
 
 ### `Write(string path, string secret)`
@@ -96,7 +78,24 @@ Console.WriteLine("The secret value got from reference is " + resolvedRef);
 ### `ResolveEnv()`
 Take a map of system's environment variables and replaces the values of those which store references of secrets in SecretHub (`secrethub://<path>`) with the value of the respective secret. The other entries in the map remain untouched.
 ```csharp
-Doctionary<string, string> resolvedEnv = client.ResolveEnv(dictionaryToResolve);
+Dictionary<string, string> resolvedEnv = client.ResolveEnv();
+// resolvedEnv = Dictionary<string, string> {
+// 		"REFERENCE_TO_SECRET_ENV_VAR": "some-secret-value",
+//		"NOT_A_REFERENCE_ENV_VAR": "some-other-value"
+// }
+```
+
+### Exceptions
+In order to catch any exceptions thrown by the library (thus avoiding your program to crash), you have to put the lines that use the package in a `try-catch` block.
+```csharp
+try 
+{
+	string secret = client.Read("path/to/secret");
+} 
+catch(Exception ex)
+{
+	Console.WriteLine(ex.Message);
+}
 ```
 
 ## Resources
