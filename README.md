@@ -84,23 +84,34 @@ Console.WriteLine("The secret value got from reference is " + resolvedRef);
 ```
 
 ### `ResolveEnv()`
-Take a map of system's environment variables and replaces the values of those which store references of secrets in SecretHub (`secrethub://<path>`) with the value of the respective secret. The other entries in the map remain untouched.
+Load all of the process's environment variables in a dictionary and replace all values that are a reference to a secret (`secrethub://<path>`) to the value as stored in SecretHub. The other values in the dictionary remain untouched.
+
+For example, if the following two environment variables are set:
+ - `MY_SECRET=secrethub://path/to/secret`
+ - `OTHER_VARIABLE=some-other-value`
+
+Then the following call to `ResolveEnv()`
 ```csharp
 Dictionary<string, string> resolvedEnv = client.ResolveEnv();
-// resolvedEnv = Dictionary<string, string> {
-// 		"REFERENCE_TO_SECRET_ENV_VAR": "some-secret-value",
-//		"NOT_A_REFERENCE_ENV_VAR": "some-other-value"
-// }
+```
+
+Would lead to the `resolvedEnv` containing the following contents:
+```csharp
+Doctionary<string, string>
+{
+    {"MY_SECRET", "the value of the secret path/to/secret"},
+    {"OTHER_VARIABLE", "some-other-value"}
+}
 ```
 
 ### Exceptions
-In order to catch any exceptions thrown by the library (thus avoiding your program to crash), you have to put the lines that use the package in a `try-catch` block.
+Any error encountered by the SecretHub client will be thrown as an `ApplicationException`. The full error message can be retrieved from the `Message` field.
 ```csharp
 try 
 {
 	string secret = client.Read("path/to/secret");
 } 
-catch(Exception ex)
+catch(ApplicationException ex)
 {
 	Console.WriteLine(ex.Message);
 }
