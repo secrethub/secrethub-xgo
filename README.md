@@ -11,10 +11,8 @@ SecretHub - XGO wraps the `secrethub-go` client with `cgo` exported functions so
  - [Getting help](#getting-help)
 
 ## Prerequisites
-
 To make use of the package, you will need to have the following installed:
  - [.NET Core](https://docs.microsoft.com/en-gb/dotnet/core/install/)
- - [Golang](https://golang.org/doc/install)
 
 ## Installation
 
@@ -28,8 +26,9 @@ or you can add the following line to your project's `csproj` file:
 ```
 
 ## Building from source 
+1. Make sure you have [Golang](https://golang.org/doc/install) installed.
 1. Execute `make nupkg` from the Makefile
-2. Go to your .NET project direcotry and run the following command: `dotnet add package SecretHub -s <path_to_your_secrethub-xgo_repo>`.
+1. Go to your .NET project direcotry and run the following command: `dotnet add package SecretHub -s <path_to_your_secrethub-xgo_repo>`.
 
 ## Usage
 Before doing any calls to the library, you need to create you SecretHub client:
