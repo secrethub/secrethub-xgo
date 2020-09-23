@@ -57,7 +57,7 @@ Retrieve a secret as a string.
 ### `Exists(string path)`
 Check if a secret exists at `path`.
 ```csharp
-bool isSecret = client.Exists("path/to/secret");
+bool secretExists = client.Exists("path/to/secret");
 ```
 
 ### `Write(string path, string secret)`
@@ -70,10 +70,6 @@ client.Write("path/to/secret", "secret_value");
 Delete the secret found at `path`.
 ```csharp
 client.Remove("path/to/secret");
-if (!client.Exists("path/to/secret"))
-{
-    Console.WriteLine("Secret deleted successfully");
-}
 ```
 
 ### `Resolve(string ref)`
