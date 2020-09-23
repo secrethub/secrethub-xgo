@@ -55,9 +55,9 @@ nupkg: lib lib-win
 	mv $(DOTNET_DIR)/build/SecretHub.*.nupkg .
 	make clean
 
-#.PHONY: nupkg-publish
-#nupkg-publish: nupkg
-	#dotnet nuget push *.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
+.PHONY: nupkg-publish
+nupkg-publish: nupkg
+	dotnet nuget push SecretHub.*.nupkg --api-key ${API_KEY} --source https://api.nuget.org/v3/index.json
 
 .PHONY: deps
 .ONESHELL:
