@@ -74,9 +74,9 @@ nupkg: lib-all
 	@make clean --no-print-directory
 	@echo "NuGet Package Ready ^-^"
 
-#.PHONY: nupkg-publish
-#nupkg-publish: nupkg
-#	dotnet nuget push *.nupkg --api-key <API_KEY> --source 	https://api.nuget.org/v3/index.json
+.PHONY: nupkg-publish
+nupkg-publish: nupkg
+	dotnet nuget push SecretHub.*.nupkg --api-key ${API_KEY} --source https://api.nuget.org/v3/index.json
 
 .PHONY: deps
 deps:
