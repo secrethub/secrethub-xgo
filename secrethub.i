@@ -46,8 +46,8 @@ extern struct Secret {
 extern struct SecretVersion {
 	uuid SecretVersionID;
 	struct Secret Secret;
-    int Version;
-    char* Data;
-    time CreatedAt;
+    	int Version;
+    	char* Data;
+    	time CreatedAt;
 	char* Status;
 };
