@@ -2,10 +2,14 @@
 
 SecretHub - XGO wraps the `secrethub-go` client with cgo exported functions so it can be called form other languages, e.g. C, C#, Python, Ruby, NodeJS, and Java. To generate the code that will then be wrapped in the library used by a certian programming language, we use `swig`.
 
-## Supported Programming languages
+## Roadmap
 
-- [C#](https://github.com/secrethub/secrethub-dotnet)
-
+- [x] [C#](https://github.com/secrethub/secrethub-dotnet)
+- [ ] Java
+- [ ] NodeJS
+- [ ] PHP
+- [ ] Python
+- [ ] Ruby
 
 ## Resources
 
