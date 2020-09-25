@@ -76,7 +76,14 @@ deps:
 	echo "export SWIG_PATH=usr/local/share/swig/bin" | sudo tee -a /etc/profile
 	echo "export PATH=$(SWIG_PATH):$(PATH)" | sudo tee -a /etc/profile
 	source /etc/profile
-
+	# install dotnet
+	wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+	sudo dpkg -i packages-microsoft-prod.deb
+	sudo apt-get update 
+	sudo apt-get install -y apt-transport-https
+	sudo apt-get update
+	sudo apt-get install -y dotnet-sdk-3.1
+	rm -f packages-microsoft-prod.deb
 
 .PHONY: clean
 clean:
