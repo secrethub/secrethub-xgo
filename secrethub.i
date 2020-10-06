@@ -17,6 +17,10 @@
   }
 }
 
+// Do not generate a default constructor for the Secret and SecretVersion types.
+%nodefaultctor Secret;
+%nodefaultctor SecretVersion;
+
 extern struct Client {
     %extend {
         Client(char **errMessage);
