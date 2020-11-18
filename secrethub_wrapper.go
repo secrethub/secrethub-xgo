@@ -2,7 +2,7 @@ package main
 
 /*
 #include "stdint.h"
-typedef long long time;
+typedef long long cgoTime;
 typedef char* uuid;
 
 struct Secret {
@@ -14,7 +14,7 @@ struct Secret {
 	int VersionCount;
 	int LatestVersion;
 	char* Status;
-	time CreatedAt;
+	cgoTime CreatedAt;
 };
 
 struct SecretVersion {
@@ -22,7 +22,7 @@ struct SecretVersion {
 	struct Secret Secret;
 	int Version;
 	char* Data;
-	time CreatedAt;
+	cgoTime CreatedAt;
 	char* Status;
 };
 
@@ -37,11 +37,12 @@ import "C"
 import (
 	"encoding/json"
 	"errors"
-	"github.com/secrethub/secrethub-go/pkg/secrethub"
 	"os"
 	"strings"
 	"sync"
 	"unsafe"
+
+	"github.com/secrethub/secrethub-go/pkg/secrethub"
 )
 
 var clients sync.Map
@@ -53,7 +54,7 @@ var nextClientID uint64 = 1
 //
 // This method is called by the Client constructor in the target language.
 //export new_Client
-func new_Client(errMessage **C.char) *C.struct_Client{
+func new_Client(errMessage **C.char) *C.struct_Client {
 	options := []secrethub.ClientOption{
 		secrethub.WithAppInfo(&secrethub.AppInfo{
 			Name:    "secrethub-xgo",

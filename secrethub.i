@@ -34,7 +34,7 @@ extern struct Client {
         void Write(char* path, char* secret, char** errMessage);
     }
 };
-
+%immutable;
 extern struct Secret {
 	uuid SecretID;
 	uuid DirID;
@@ -44,14 +44,14 @@ extern struct Secret {
 	int VersionCount;
 	int LatestVersion;
 	char* Status;
-	time CreatedAt;
+	cgoTime CreatedAt;
 };
 
 extern struct SecretVersion {
-	uuid SecretVersionID;
+  uuid SecretVersionID;
 	struct Secret Secret;
 	int Version;
 	char* Data;
-	time CreatedAt;
+	cgoTime CreatedAt;
 	char* Status;
 };
