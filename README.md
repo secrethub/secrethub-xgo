@@ -1,3 +1,9 @@
+<hr/>
+<p align="center">
+  <sub><img src="https://1password.com/img/logo-v1.svg" alt="1Password" width="20" /></sub> <b>SecretHub has joined 1Password!</b> Find out more on the <a href="https://secrethub.io/blog/secrethub-joins-1password/">SecretHub blog</a>. 🎉
+</p>
+<hr/>
+
 # SecretHub XGO
 
 SecretHub - XGO wraps the `secrethub-go` client with cgo exported functions and compiles them into a shared library.
